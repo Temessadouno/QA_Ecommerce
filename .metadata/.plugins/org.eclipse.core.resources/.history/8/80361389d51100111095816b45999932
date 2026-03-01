@@ -1,0 +1,128 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%-- ═══════════════════════════════════════════════════════
+     FRAGMENT : Navbar principale (inclure avec jsp:include)
+     Contrainte qualité : Aucune logique métier ici (MVC)
+     ═══════════════════════════════════════════════════════ --%>
+
+<%
+  // Calcul nombre d'articles panier pour le badge
+  int nbPanier = 0;
+  models.Client clientNav = (models.Client) session.getAttribute("client");
+  if (clientNav != null) {
+    java.util.List<?> panierNav = (java.util.List<?>) request.getAttribute("panierItems");
+    if (panierNav != null) nbPanier = panierNav.size();
+  }
+  String activePage = (String) request.getAttribute("activePage");
+%>
+
+<nav class="navbar" role="navigation" aria-label="Navigation principale">
+
+  <%-- ── Logo ── --%>
+  <a class="nav-brand" href="${pageContext.request.contextPath}/catalogue" aria-label="TechShop Accueil">
+    <div class="nav-brand-icon" aria-hidden="true">⚡</div>
+    <span class="brand-name">Tech<span class="brand-accent">Shop</span></span>
+  </a>
+
+  <%-- ── Liens principaux ── --%>
+  <ul class="nav-links" role="list">
+    <li>
+      <a href="${pageContext.request.contextPath}/catalogue"
+         class="nav-link ${activePage == 'catalogue' ? 'active' : ''}"
+         aria-current="${activePage == 'catalogue' ? 'page' : 'false'}">
+        <span aria-hidden="true">🏪</span> Catalogue
+      </a>
+    </li>
+    <c:if test="${not empty sessionScope.client}">
+      <li>
+        <a href="${pageContext.request.contextPath}/commande/historique"
+           class="nav-link ${activePage == 'commandes' ? 'active' : ''}"
+           aria-current="${activePage == 'commandes' ? 'page' : 'false'}">
+          <span aria-hidden="true">📦</span> Commandes
+        </a>
+      </li>
+    </c:if>
+    <c:if test="${sessionScope.client.admin}">
+      <li>
+        <a href="${pageContext.request.contextPath}/admin"
+           class="nav-link ${activePage == 'admin' ? 'active' : ''}"
+           aria-current="${activePage == 'admin' ? 'page' : 'false'}">
+          <span aria-hidden="true">⚙️</span> Administration
+        </a>
+      </li>
+    </c:if>
+  </ul>
+
+  <%-- ── Actions droite ── --%>
+  <div class="nav-actions">
+
+    <%-- Panier (clients seulement) --%>
+    <c:if test="${not empty sessionScope.client and not sessionScope.client.admin}">
+      <a href="${pageContext.request.contextPath}/panier"
+         class="nav-cart-btn"
+         aria-label="Panier (${nbPanier} articles)">
+        <span aria-hidden="true">🛒</span>
+        <span>Panier</span>
+        <c:if test="${nbPanier > 0}">
+          <span class="cart-badge" aria-hidden="true">${nbPanier}</span>
+        </c:if>
+      </a>
+    </c:if>
+
+    <%-- Utilisateur connecté --%>
+    <c:choose>
+      <c:when test="${not empty sessionScope.client}">
+        <div class="nav-user-menu">
+          <button class="nav-user-btn" aria-haspopup="true" aria-expanded="false" type="button">
+            <div class="user-avatar" aria-hidden="true">
+              ${fn:substring(sessionScope.client.prenom, 0, 1)}${fn:substring(sessionScope.client.nom, 0, 1)}
+            </div>
+            <span>${sessionScope.client.prenom}</span>
+            <c:if test="${sessionScope.client.admin}">
+              <span class="badge badge-admin" style="font-size:0.65rem;padding:0.15rem 0.45rem;">ADMIN</span>
+            </c:if>
+            <span aria-hidden="true">▾</span>
+          </button>
+          <div class="dropdown-menu" role="menu">
+            <div style="padding:0.6rem 0.9rem; border-bottom:1px solid var(--border); margin-bottom:0.4rem;">
+              <div style="font-size:0.85rem;font-weight:600;color:var(--text-primary);">${sessionScope.client.nomComplet}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);">${sessionScope.client.email}</div>
+            </div>
+            <c:if test="${not sessionScope.client.admin}">
+              <a href="${pageContext.request.contextPath}/commande/historique"
+                 class="dropdown-item" role="menuitem">
+                <span aria-hidden="true">📦</span> Mes commandes
+              </a>
+            </c:if>
+            <c:if test="${sessionScope.client.admin}">
+              <a href="${pageContext.request.contextPath}/admin"
+                 class="dropdown-item" role="menuitem">
+                <span aria-hidden="true">⚙️</span> Dashboard admin
+              </a>
+            </c:if>
+            <div class="dropdown-divider" role="separator"></div>
+            <a href="${pageContext.request.contextPath}/logout"
+               class="dropdown-item danger" role="menuitem">
+              <span aria-hidden="true">🚪</span> Se déconnecter
+            </a>
+          </div>
+        </div>
+      </c:when>
+      <c:otherwise>
+        <a href="${pageContext.request.contextPath}/login"
+           class="btn-auth btn-login">Connexion</a>
+        <a href="${pageContext.request.contextPath}/inscription"
+           class="btn-auth btn-signup">S'inscrire</a>
+      </c:otherwise>
+    </c:choose>
+  </div>
+
+  <%-- Mobile toggle --%>
+  <button class="mobile-menu-btn" aria-label="Menu" aria-expanded="false"
+          onclick="document.querySelector('.nav-links').classList.toggle('mobile-open')"
+          style="display:none;" id="mobileMenuBtn">
+    <span></span><span></span><span></span>
+  </button>
+
+</nav>

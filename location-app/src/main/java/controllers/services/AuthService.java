@@ -1,0 +1,82 @@
+package controllers.services;
+
+import java.util.Optional;
+
+import dao.client.*;
+import models.Client;
+import util.HashUtil;
+
+/**
+ * Service d'authentification et d'inscription.
+ * Règles métier : RM-01 (auth obligatoire), RM-06 (unicité email).
+ */
+public class AuthService {
+
+    private final ClientDAO clientDAO;
+
+    public AuthService() {
+        this.clientDAO = new ClientDAOImplement();
+    }
+
+    // Injection de dépendance (pour les tests)
+    public AuthService(ClientDAO clientDAO) {
+        this.clientDAO = clientDAO;
+    }
+
+    /**
+     * Authentifie un client par email et mot de passe.
+     * @throws AuthException si les identifiants sont invalides
+     */
+    public Client authentifier(String email, String motDePasse) {
+        if (email == null || motDePasse == null) {
+            throw new AuthException("Email et mot de passe obligatoires");
+        }
+
+        Optional<Client> opt = clientDAO.findByEmail(email.trim().toLowerCase());
+        if (opt.isEmpty()) {
+            throw new AuthException("Email ou mot de passe incorrect");
+        }
+
+        Client client = opt.get();
+        if (!HashUtil.verify(motDePasse, client.getMotDePasseHash())) {
+            throw new AuthException("Email ou mot de passe incorrect");
+        }
+
+        return client;
+    }
+
+    /**
+     * Inscrit un nouveau client.
+     * @throws AuthException si l'email est déjà utilisé
+     */
+    public Client inscrire(String nom, String prenom, String email,
+                           String motDePasse, String adresse) {
+        if (nom == null || prenom == null || email == null || motDePasse == null) {
+            throw new AuthException("Tous les champs obligatoires doivent être remplis");
+        }
+        if (motDePasse.length() < 6) {
+            throw new AuthException("Le mot de passe doit contenir au moins 6 caractères");
+        }
+
+        String emailNorm = email.trim().toLowerCase();
+        if (clientDAO.existsByEmail(emailNorm)) {
+            throw new AuthException("Cet email est déjà utilisé");
+        }
+
+        Client client = new Client(
+            nom.trim(), prenom.trim(), emailNorm,
+            HashUtil.sha256(motDePasse),
+            adresse != null ? adresse.trim() : ""
+        );
+
+        return clientDAO.save(client);
+    }
+
+    /**
+     * Exception levée lors des erreurs d'authentification.
+     */
+    @SuppressWarnings("serial")
+	public static class AuthException extends RuntimeException {
+        public AuthException(String message) { super(message); }
+    }
+}

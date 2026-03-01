@@ -1,0 +1,118 @@
+package dao.panier;
+
+
+import models.PanierItem;
+import util.JPAUtil;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+
+import java.util.List;
+import java.util.Optional;
+
+public class PanierDAOImplement implements PanierDAO {
+
+    @Override
+    public PanierItem save(PanierItem item) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.persist(item);
+            em.getTransaction().commit();
+            return item;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw new RuntimeException("Erreur ajout panier", e);
+        } finally { em.close(); }
+    }
+
+    @Override
+    public PanierItem update(PanierItem item) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            PanierItem merged = em.merge(item);
+            em.getTransaction().commit();
+            return merged;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw new RuntimeException("Erreur mise à jour panier", e);
+        } finally { em.close(); }
+    }
+
+    @Override
+    public void delete(Integer itemId) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            PanierItem item = em.find(PanierItem.class, itemId);
+            if (item != null) em.remove(item);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw new RuntimeException("Erreur suppression article panier", e);
+        } finally { em.close(); }
+    }
+
+    @Override
+    public void deleteByClientId(Integer clientId) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.createQuery("DELETE FROM PanierItem p WHERE p.client.id = :cid")
+              .setParameter("cid", clientId)
+              .executeUpdate();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw new RuntimeException("Erreur vidage panier", e);
+        } finally { em.close(); }
+    }
+
+    @Override
+    public List<PanierItem> findByClientId(Integer clientId) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            return em.createQuery(
+                "SELECT p FROM PanierItem p WHERE p.client.id = :cid ORDER BY p.addedAt ASC",
+                PanierItem.class)
+                .setParameter("cid", clientId)
+                .getResultList();
+        } finally { em.close(); }
+    }
+
+    @Override
+    public Optional<PanierItem> findByClientAndProduit(Integer clientId, Integer produitId) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            PanierItem item = em.createQuery(
+                "SELECT p FROM PanierItem p WHERE p.client.id = :cid AND p.produit.id = :pid",
+                PanierItem.class)
+                .setParameter("cid", clientId)
+                .setParameter("pid", produitId)
+                .getSingleResult();
+            return Optional.of(item);
+        } catch (NoResultException e) {
+            return Optional.empty();
+        } finally { em.close(); }
+    }
+    
+    @Override
+    public int getPanierCount(Integer clientId) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            // On utilise SUM(p.quantite) pour avoir le total réel d'articles
+            // COALESCE permet de retourner 0 au lieu de null si le panier est vide
+            Long count = em.createQuery(
+                "SELECT COALESCE(SUM(p.quantite), 0) FROM PanierItem p WHERE p.client.id = :cid", 
+                Long.class)
+                .setParameter("cid", clientId)
+                .getSingleResult();
+                
+            return count.intValue();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors du comptage des articles du panier", e);
+        } finally {
+            em.close();
+        }
+    }
+}

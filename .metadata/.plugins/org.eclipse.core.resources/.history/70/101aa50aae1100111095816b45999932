@@ -1,0 +1,5 @@
+package dao.panier;
+
+public interface PanierDAO {
+
+}

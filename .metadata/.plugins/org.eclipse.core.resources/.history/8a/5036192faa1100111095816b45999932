@@ -1,0 +1,179 @@
+package dao;
+
+
+import dao.ProduitDAO;
+import models.Produit;
+import util.JPAUtil;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Implémentation JPA du ProduitDAO.
+ * Utilise JPQL avec des NamedParameters pour éviter les injections SQL.
+ */
+public class ProduitDAOImplement implements ProduitDAO {
+
+    @Override
+    public Produit save(Produit produit) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.persist(produit);
+            em.getTransaction().commit();
+            return produit;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw new RuntimeException("Erreur lors de la création du produit", e);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public Produit update(Produit produit) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Produit merged = em.merge(produit);
+            em.getTransaction().commit();
+            return merged;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw new RuntimeException("Erreur lors de la mise à jour du produit", e);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void delete(Integer id) {
+        softDelete(id);
+    }
+
+    @Override
+    public Optional<Produit> findById(Integer id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            Produit p = em.find(Produit.class, id);
+            return Optional.ofNullable((p != null && !p.isDeleted()) ? p : null);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Produit> findAll() {
+        return findAllActive();
+    }
+
+    @Override
+    public List<Produit> findAllActive() {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Produit> q = em.createQuery(
+                "SELECT p FROM Produit p WHERE p.deleted = false ORDER BY p.nom ASC",
+                Produit.class);
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Produit> search(String keyword) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            String pattern = "%" + keyword.toLowerCase() + "%";
+            TypedQuery<Produit> q = em.createQuery(
+                "SELECT p FROM Produit p WHERE p.deleted = false AND " +
+                "(LOWER(p.nom) LIKE :kw OR LOWER(p.description) LIKE :kw OR LOWER(p.marque) LIKE :kw) " +
+                "ORDER BY p.nom ASC",
+                Produit.class);
+            q.setParameter("kw", pattern);
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Produit> findByCategorie(Integer categorieId) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Produit> q = em.createQuery(
+                "SELECT p FROM Produit p WHERE p.deleted = false AND p.categorie.id = :catId ORDER BY p.nom ASC",
+                Produit.class);
+            q.setParameter("catId", categorieId);
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Produit> searchAndFilter(String keyword, Integer categorieId) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            StringBuilder jpql = new StringBuilder(
+                "SELECT p FROM Produit p WHERE p.deleted = false ");
+
+            if (keyword != null && !keyword.isBlank()) {
+                jpql.append("AND (LOWER(p.nom) LIKE :kw OR LOWER(p.description) LIKE :kw OR LOWER(p.marque) LIKE :kw) ");
+            }
+            if (categorieId != null) {
+                jpql.append("AND p.categorie.id = :catId ");
+            }
+            jpql.append("ORDER BY p.nom ASC");
+
+            TypedQuery<Produit> q = em.createQuery(jpql.toString(), Produit.class);
+
+            if (keyword != null && !keyword.isBlank()) {
+                q.setParameter("kw", "%" + keyword.toLowerCase() + "%");
+            }
+            if (categorieId != null) {
+                q.setParameter("catId", categorieId);
+            }
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void updateStock(Integer produitId, int newStock) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.createQuery("UPDATE Produit p SET p.stock = :stock WHERE p.id = :id")
+              .setParameter("stock", newStock)
+              .setParameter("id", produitId)
+              .executeUpdate();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw new RuntimeException("Erreur mise à jour stock", e);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void softDelete(Integer produitId) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.createQuery("UPDATE Produit p SET p.deleted = true WHERE p.id = :id")
+              .setParameter("id", produitId)
+              .executeUpdate();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw new RuntimeException("Erreur suppression logique produit", e);
+        } finally {
+            em.close();
+        }
+    }
+}

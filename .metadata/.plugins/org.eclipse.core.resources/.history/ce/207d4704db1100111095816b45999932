@@ -1,0 +1,161 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Administration — TechShop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
+</head>
+<body>
+<%@ include file="../common/navbar.jsp" %>
+
+<div class="admin-layout">
+
+  <%-- ── Sidebar admin ── --%>
+  <nav class="admin-sidebar" aria-label="Navigation administration">
+    <div style="padding:0.5rem 0.75rem 1rem;margin-bottom:0.5rem;">
+      <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">
+        ⚙️ Administration
+      </div>
+    </div>
+
+    <div class="admin-nav-section">
+      <div class="admin-nav-label">Tableau de bord</div>
+      <a href="${pageContext.request.contextPath}/admin" class="admin-nav-item active">
+        <span class="admin-nav-icon">📊</span> Vue d'ensemble
+      </a>
+    </div>
+
+    <div class="admin-nav-section">
+      <div class="admin-nav-label">Catalogue</div>
+      <a href="${pageContext.request.contextPath}/admin/produits" class="admin-nav-item">
+        <span class="admin-nav-icon">📱</span> Produits
+      </a>
+      <a href="${pageContext.request.contextPath}/admin/categories" class="admin-nav-item">
+        <span class="admin-nav-icon">🏷️</span> Catégories
+      </a>
+    </div>
+
+    <div class="admin-nav-section">
+      <div class="admin-nav-label">Ventes</div>
+      <a href="${pageContext.request.contextPath}/admin/commandes" class="admin-nav-item">
+        <span class="admin-nav-icon">📦</span> Commandes
+      </a>
+    </div>
+
+    <div class="admin-nav-section" style="margin-top:auto;border-top:1px solid var(--border);padding-top:1rem;">
+      <a href="${pageContext.request.contextPath}/catalogue" class="admin-nav-item">
+        <span class="admin-nav-icon">🏪</span> Voir la boutique
+      </a>
+      <a href="${pageContext.request.contextPath}/logout" class="admin-nav-item"
+         style="color:var(--red-alert);">
+        <span class="admin-nav-icon">🚪</span> Déconnexion
+      </a>
+    </div>
+  </nav>
+
+  <%-- ── Contenu principal ── --%>
+  <main class="admin-content">
+
+    <%-- Alertes --%>
+    <c:if test="${not empty sessionScope.succes}">
+      <div class="alert alert-success"><span>✅</span><span>${sessionScope.succes}</span></div>
+      <c:remove var="succes" scope="session"/>
+    </c:if>
+    <c:if test="${not empty sessionScope.erreur}">
+      <div class="alert alert-error"><span>⚠️</span><span>${sessionScope.erreur}</span></div>
+      <c:remove var="erreur" scope="session"/>
+    </c:if>
+
+    <div class="page-header fade-up">
+      <h1 class="page-title">
+        Bonjour, <span style="color:var(--gold)">${sessionScope.client.prenom}</span> 👋
+      </h1>
+      <p class="page-subtitle">Vue d'ensemble de votre boutique TechShop</p>
+    </div>
+
+    <%-- Stats --%>
+    <div class="stats-grid fade-up fade-up-1">
+      <div class="stat-card gold">
+        <div class="stat-icon gold" aria-hidden="true">📱</div>
+        <div class="stat-value">${nbProduits}</div>
+        <div class="stat-label">Produits actifs</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-icon blue" aria-hidden="true">🏷️</div>
+        <div class="stat-value">${nbCategories}</div>
+        <div class="stat-label">Catégories</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon green" aria-hidden="true">📦</div>
+        <div class="stat-value">${nbCommandes}</div>
+        <div class="stat-label">Commandes total</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon red" aria-hidden="true">⚡</div>
+        <div class="stat-value">JEE</div>
+        <div class="stat-label">Architecture MVC</div>
+      </div>
+    </div>
+
+    <%-- Actions rapides --%>
+    <div class="card fade-up fade-up-2" style="margin-bottom:2rem;">
+      <h2 style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:1.25rem;
+                 color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;">
+        Actions rapides
+      </h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
+        <a href="${pageContext.request.contextPath}/admin/produits/nouveau"
+           class="btn btn-primary" style="justify-content:flex-start;">
+          <span>➕</span> Nouveau produit
+        </a>
+        <a href="${pageContext.request.contextPath}/admin/produits"
+           class="btn btn-secondary" style="justify-content:flex-start;">
+          <span>📋</span> Gérer les produits
+        </a>
+        <a href="${pageContext.request.contextPath}/admin/commandes"
+           class="btn btn-ghost" style="justify-content:flex-start;">
+          <span>📦</span> Voir les commandes
+        </a>
+        <a href="${pageContext.request.contextPath}/admin/categories"
+           class="btn btn-ghost" style="justify-content:flex-start;">
+          <span>🏷️</span> Gérer les catégories
+        </a>
+      </div>
+    </div>
+
+    <%-- Qualité logicielle : indicateurs PAQ --%>
+    <div class="card fade-up fade-up-3">
+      <h2 style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:1.25rem;
+                 color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;">
+        📋 Indicateurs Qualité Logicielle (PAQ)
+      </h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;">
+        <div style="padding:1rem;background:var(--bg-elevated);border:1px solid rgba(76,219,143,0.2);border-radius:var(--radius-md);">
+          <div style="font-size:1.5rem;font-weight:800;font-family:var(--font-display);color:var(--green-ok);">≥75%</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;">Couverture JaCoCo (KQI-01)</div>
+        </div>
+        <div style="padding:1rem;background:var(--bg-elevated);border:1px solid rgba(240,192,64,0.2);border-radius:var(--radius-md);">
+          <div style="font-size:1.5rem;font-weight:800;font-family:var(--font-display);color:var(--gold);">MVC</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;">Architecture respectée (KQI-07)</div>
+        </div>
+        <div style="padding:1rem;background:var(--bg-elevated);border:1px solid rgba(126,184,247,0.2);border-radius:var(--radius-md);">
+          <div style="font-size:1.5rem;font-weight:800;font-family:var(--font-display);color:var(--blue-ice);">OWASP</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;">Sécurité conforme</div>
+        </div>
+        <div style="padding:1rem;background:var(--bg-elevated);border:1px solid rgba(76,219,143,0.2);border-radius:var(--radius-md);">
+          <div style="font-size:1.5rem;font-weight:800;font-family:var(--font-display);color:var(--green-ok);">SHA-256</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;">Mots de passe hashés</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<footer class="site-footer"><p>© 2025 TechShop — Panneau d'administration</p></footer>
+</body>
+</html>

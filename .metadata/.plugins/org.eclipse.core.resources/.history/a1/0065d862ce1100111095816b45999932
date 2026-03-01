@@ -1,0 +1,113 @@
+package controllers;
+
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import models.Categorie;
+import models.Produit;
+
+import java.io.IOException;
+
+import java.util.List;
+import java.util.Optional;
+
+import dao.categorie.*;
+import dao.produit.*;
+
+/**
+ * Servlet du catalogue : liste, recherche, filtre et détail produit.
+ * Accessible aux visiteurs et clients (non protégé).
+ */
+@WebServlet(urlPatterns = {"/catalogue", "/produit/detail", "/"})
+public class CatalogueServlet extends HttpServlet {
+
+    private ProduitDAO produitDAO;
+    private CategorieDAO categorieDAO;
+
+    @Override
+    public void init() {
+        produitDAO   = new ProduitDAOImplement();
+        categorieDAO = new CategorieDAOImplement();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        String path = req.getServletPath();
+
+        switch (path) {
+            case "/":
+            case "/catalogue":
+                showCatalogue(req, resp);
+                break;
+            case "/produit/detail":
+                showDetail(req, resp);
+                break;
+            default:
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    private void showCatalogue(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        String keyword     = req.getParameter("q");
+        String catIdParam  = req.getParameter("categorie");
+
+        Integer categorieId = null;
+        if (catIdParam != null && !catIdParam.isBlank()) {
+            try { categorieId = Integer.parseInt(catIdParam); }
+            catch (NumberFormatException ignored) {}
+        }
+
+        // Récupération des produits selon les filtres
+        List<Produit> produits;
+        if ((keyword != null && !keyword.isBlank()) || categorieId != null) {
+            produits = produitDAO.searchAndFilter(keyword, categorieId);
+        } else {
+            produits = produitDAO.findAllActive();
+        }
+
+        // Toutes les catégories pour le formulaire de filtre
+        List<Categorie> categories = categorieDAO.findAll();
+
+        req.setAttribute("produits",    produits);
+        req.setAttribute("categories",  categories);
+        req.setAttribute("keyword",     keyword);
+        req.setAttribute("categorieId", categorieId);
+        req.setAttribute("totalProduits", produits.size());
+
+        req.getRequestDispatcher("/WEB-INF/views/common/catalogue.jsp").forward(req, resp);
+    }
+
+    private void showDetail(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        String idParam = req.getParameter("id");
+        if (idParam == null || idParam.isBlank()) {
+            resp.sendRedirect(req.getContextPath() + "/catalogue");
+            return;
+        }
+
+        try {
+            Integer id = Integer.parseInt(idParam);
+            Optional<Produit> opt = produitDAO.findById(id);
+
+            if (opt.isEmpty()) {
+                req.setAttribute("erreur", "Produit introuvable ou indisponible");
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            req.setAttribute("produit", opt.get());
+            req.getRequestDispatcher("/WEB-INF/views/common/detail-produit.jsp").forward(req, resp);
+
+        } catch (NumberFormatException e) {
+            resp.sendRedirect(req.getContextPath() + "/catalogue");
+        }
+    }
+}

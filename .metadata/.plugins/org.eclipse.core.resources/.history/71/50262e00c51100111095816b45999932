@@ -1,0 +1,141 @@
+package controllers;
+
+import controllers.services.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import models.Client;
+import models.PanierItem;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.List;
+
+/**
+ * Servlet de gestion du panier.
+ * Toutes les routes sont protégées par AuthFilter (RM-01).
+ */
+@SuppressWarnings("serial")
+@WebServlet(urlPatterns = {"/panier", "/panier/ajouter", "/panier/modifier", "/panier/supprimer"})
+public class PanierServlet extends HttpServlet {
+
+    private PanierServices panierService;
+
+    @Override
+    public void init() {
+        panierService = new PanierServices();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        if ("/panier".equals(req.getServletPath())) {
+            afficherPanier(req, resp);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        req.setCharacterEncoding("UTF-8");
+        String path = req.getServletPath();
+
+        switch (path) {
+            case "/panier/ajouter":
+                ajouterAuPanier(req, resp);
+                break;
+            case "/panier/modifier":
+                modifierPanier(req, resp);
+                break;
+            case "/panier/supprimer":
+                supprimerArticle(req, resp);
+                break;
+            default:
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    private void afficherPanier(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        Client client = getClientFromSession(req);
+        List<PanierItem> items = panierService.getPanier(client.getId());
+        BigDecimal total = panierService.calculerTotal(items);
+
+        req.setAttribute("panierItems", items);
+        req.setAttribute("total", total);
+        req.getRequestDispatcher("/WEB-INF/views/client/panier.jsp").forward(req, resp);
+    }
+
+    private void ajouterAuPanier(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, ServletException {
+
+        Client client = getClientFromSession(req);
+
+        try {
+            Integer produitId = Integer.parseInt(req.getParameter("produitId"));
+            int quantite = Integer.parseInt(req.getParameter("quantite"));
+
+            panierService.ajouterAuPanier(client, produitId, quantite);
+
+            // Redirection vers la page précédente ou le panier
+            String referer = req.getHeader("Referer");
+            resp.sendRedirect(referer != null ? referer : req.getContextPath() + "/panier");
+
+        } catch (CommandeService.StockInsuffisantException e) {
+            req.setAttribute("erreur", e.getMessage());
+            req.getRequestDispatcher("/WEB-INF/views/client/panier.jsp").forward(req, resp);
+        } catch (PanierServices.PanierException e) {
+            req.setAttribute("erreur", e.getMessage());
+            req.getRequestDispatcher("/WEB-INF/views/client/panier.jsp").forward(req, resp);
+        } catch (NumberFormatException e) {
+            resp.sendRedirect(req.getContextPath() + "/catalogue");
+        }
+    }
+
+    private void modifierPanier(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        try {
+            Integer itemId = Integer.parseInt(req.getParameter("itemId"));
+            int quantite   = Integer.parseInt(req.getParameter("quantite"));
+
+            if (quantite <= 0) {
+                panierService.supprimerArticle(itemId);
+            } else {
+                // Récupération via DAO pour mise à jour directe
+                new com.ecommerce.dao.impl.PanierDAOImpl().findByClientAndProduit(0, 0)
+                    .ifPresent(item -> {
+                        item.setQuantite(quantite);
+                        new com.ecommerce.dao.impl.PanierDAOImpl().update(item);
+                    });
+            }
+        } catch (NumberFormatException ignored) {}
+
+        resp.sendRedirect(req.getContextPath() + "/panier");
+    }
+
+    private void supprimerArticle(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        try {
+            Integer itemId = Integer.parseInt(req.getParameter("itemId"));
+            panierService.supprimerArticle(itemId);
+        } catch (NumberFormatException ignored) {}
+
+        resp.sendRedirect(req.getContextPath() + "/panier");
+    }
+
+    private Client getClientFromSession(HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        if (session == null) throw new IllegalStateException("Session introuvable");
+        Client client = (Client) session.getAttribute("client");
+        if (client == null) throw new IllegalStateException("Client non connecté");
+        return client;
+    }
+}

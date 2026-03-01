@@ -1,0 +1,117 @@
+22:13:25 Memory Pressure: Moderate
+22:13:35 Memory Pressure: Moderate
+22:13:45 Memory Pressure: Moderate
+22:13:55 Memory Pressure: Moderate
+22:14:06 Memory Pressure: Moderate
+22:14:16 Memory Pressure: Moderate
+22:14:26 Memory Pressure: Moderate
+22:14:36 Memory Pressure: Moderate
+22:14:46 Memory Pressure: Moderate
+22:14:56 Memory Pressure: Moderate
+22:15:06 Memory Pressure: Moderate
+22:15:11 Memory Pressure: None
+22:15:16 Memory Pressure: Moderate
+22:15:26 Memory Pressure: Moderate
+22:15:36 Memory Pressure: Moderate
+22:15:46 Memory Pressure: None
+22:16:06 Memory Pressure: Moderate
+22:16:16 Memory Pressure: Moderate
+22:16:26 Memory Pressure: Moderate
+22:16:36 Memory Pressure: Moderate
+22:16:46 Memory Pressure: Moderate
+22:16:56 Memory Pressure: Moderate
+22:17:06 Memory Pressure: Moderate
+22:17:16 Memory Pressure: Moderate
+22:17:26 Memory Pressure: Moderate
+22:17:36 Memory Pressure: Moderate
+22:17:46 Memory Pressure: Moderate
+22:17:56 Memory Pressure: Moderate
+22:18:06 Memory Pressure: Moderate
+22:18:16 Memory Pressure: Moderate
+22:18:26 Memory Pressure: Moderate
+22:18:36 Memory Pressure: Moderate
+22:18:46 Memory Pressure: Moderate
+22:18:56 Memory Pressure: None
+22:19:06 Memory Pressure: Moderate
+22:19:16 Memory Pressure: Moderate
+22:19:26 Memory Pressure: Moderate
+22:19:36 Memory Pressure: Moderate
+22:19:46 Memory Pressure: Moderate
+22:19:56 Memory Pressure: Moderate
+22:20:06 Memory Pressure: Moderate
+22:20:16 Memory Pressure: Moderate
+22:20:26 Memory Pressure: Moderate
+22:20:36 Memory Pressure: Moderate
+22:20:46 Memory Pressure: Moderate
+22:20:56 Memory Pressure: Moderate
+22:21:06 Memory Pressure: Moderate
+22:21:16 Memory Pressure: Moderate
+22:21:26 Memory Pressure: Moderate
+22:21:36 Memory Pressure: Moderate
+22:21:46 Memory Pressure: Moderate
+22:21:56 Memory Pressure: Moderate
+22:22:06 Memory Pressure: Moderate
+22:22:16 Memory Pressure: Moderate
+22:22:26 Memory Pressure: Moderate
+22:22:36 Memory Pressure: Moderate
+22:22:46 Memory Pressure: Moderate
+22:22:56 Memory Pressure: Moderate
+22:23:06 Memory Pressure: Moderate
+22:23:16 Memory Pressure: Moderate
+22:23:26 Memory Pressure: Moderate
+22:23:36 Memory Pressure: Moderate
+22:23:46 Memory Pressure: Moderate
+22:23:56 Memory Pressure: None
+22:25:02 Memory Pressure: Moderate
+22:25:12 Memory Pressure: None
+22:26:12 Memory Pressure: Moderate
+22:26:22 Memory Pressure: None
+22:26:27 Memory Pressure: Moderate
+22:26:37 Memory Pressure: Moderate
+22:26:42 Memory Pressure: None
+22:28:22 Memory Pressure: Moderate
+22:28:32 Memory Pressure: Moderate
+22:28:42 Memory Pressure: Moderate
+22:28:52 Memory Pressure: Moderate
+22:28:57 Memory Pressure: None
+23:29:23 Memory Pressure: Moderate
+23:29:28 Memory Pressure: None
+23:41:35 Memory Pressure: Moderate
+23:41:40 Memory Pressure: None
+23:54:02 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
+23:54:02 Microsoft.UnloadController.HasCompletedUnloadProcessing_False
+23:54:02 Microsoft.Shutdown.OnWindowClosing
+23:54:02 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
+23:54:02 Microsoft.UnloadController.HasCompletedUnloadProcessing_True
+23:54:02 Microsoft.Shutdown.TabStripModel.CloseAllTabs
+23:54:02 Microsoft.Shutdown.TabStripModel.CloseTabs
+23:54:02 Microsoft.Shutdown.TabStripModel.CloseTabs_EdgeBeforeClosingAllTabs
+23:54:02 Microsoft.Shutdown.TabStripModel.InternalCloseTabsImpl
+23:54:02 Microsoft.Shutdown.TabStripModel.InternalCloseTabsImpl_TabClosable
+23:54:02 Microsoft.Shutdown.TabStripModel.InternalCloseTabsImpl_ClosingAll
+23:54:02 Microsoft.Shutdown.TabStripModel.CloseWebContentses
+23:54:02 Microsoft.Shutdown.TabStripModel.CloseWebContentses_FastShutdown
+23:54:02 Microsoft.Shutdown.TabStripModel.ShouldRunUnloadListenerBeforeClosing_false
+23:54:02 Tab19 RenderProcessGone
+23:54:02 Microsoft.UnloadController.ClearUnloadState
+23:54:02 Microsoft.Shutdown.TabStripModel.RunUnloadListenerBeforeClosing_false
+23:54:02 Microsoft.Shutdown.TabStripModel.InternalCloseTabsImpl_ClosedAll
+23:54:02 Microsoft.Shutdown.TabStripModel.SendDetachWebContentsNotifications
+23:54:02 Microsoft.UnloadController.ClearUnloadState
+23:54:02 Browser19 Close Tab19 at 0
+23:54:02 Tab19 WebContentsDestroyed
+23:54:02 Microsoft.UnloadController.TabStripEmpty
+23:54:02 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
+23:54:02 Microsoft.UnloadController.HasCompletedUnloadProcessing_True
+23:54:02 Microsoft.Shutdown.OnWindowClosing
+23:54:02 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
+23:54:02 Microsoft.UnloadController.HasCompletedUnloadProcessing_True
+23:54:02 Microsoft.Shutdown.OnWindowClosing_MaybeClearBrowsingDataOnExit
+23:54:02 Microsoft.Shutdown.OnWindowClosing_ClearBrowsingDataOnExitNotInProgress
+23:54:02 Microsoft.Shutdown.OnWindowClosingPostClearBrowsingData_NoBrowsingDataCleared
+23:54:02 Widget Closed: BrowserWidget
+23:54:02 Microsoft.UnloadController.HasCompletedUnloadProcessing_True
+23:54:02 Microsoft.Shutdown.OnWindowClosing
+23:54:02 Microsoft.Shutdown.OnWindowClosing_DeleteScheduled
+23:54:02 Microsoft.Browser_Removed
+23:54:03 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp

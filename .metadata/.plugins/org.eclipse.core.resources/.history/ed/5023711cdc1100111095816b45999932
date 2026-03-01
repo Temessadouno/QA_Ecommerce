@@ -1,0 +1,232 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <c:set var="isEdit" value="${not empty produit}"/>
+  <title>${isEdit ? 'Modifier' : 'Nouveau'} produit — Admin TechShop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
+</head>
+<body>
+<%@ include file="../../common/navbar.jsp" %>
+
+<div class="admin-layout">
+  <nav class="admin-sidebar" aria-label="Navigation administration">
+    <div style="padding:0.5rem 0.75rem 1rem;"><div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">⚙️ Administration</div></div>
+    <a href="${pageContext.request.contextPath}/admin" class="admin-nav-item"><span>📊</span> Dashboard</a>
+    <a href="${pageContext.request.contextPath}/admin/produits" class="admin-nav-item active"><span>📱</span> Produits</a>
+    <a href="${pageContext.request.contextPath}/admin/categories" class="admin-nav-item"><span>🏷️</span> Catégories</a>
+    <a href="${pageContext.request.contextPath}/admin/commandes" class="admin-nav-item"><span>📦</span> Commandes</a>
+  </nav>
+
+  <main class="admin-content">
+    <div class="page-header fade-up">
+      <div class="page-breadcrumb">
+        <a href="${pageContext.request.contextPath}/admin">Admin</a>
+        <span>›</span>
+        <a href="${pageContext.request.contextPath}/admin/produits">Produits</a>
+        <span>›</span>
+        <span>${isEdit ? produit.nom : 'Nouveau produit'}</span>
+      </div>
+      <h1 class="page-title">
+        ${isEdit ? '✏️ Modifier le produit' : '➕ Nouveau produit'}
+      </h1>
+    </div>
+
+    <c:if test="${not empty erreur}">
+      <div class="alert alert-error" role="alert"><span>⚠️</span><span>${erreur}</span></div>
+    </c:if>
+
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:2rem;align-items:start;" class="fade-up fade-up-1">
+
+      <%-- Formulaire principal --%>
+      <div class="card card-elevated">
+        <form action="${pageContext.request.contextPath}/admin/produits/${isEdit ? 'modifier' : 'nouveau'}"
+              method="post"
+              novalidate
+              id="produitForm"
+              aria-label="${isEdit ? 'Modifier le produit' : 'Créer un nouveau produit'}">
+
+          <c:if test="${isEdit}">
+            <input type="hidden" name="id" value="${produit.id}">
+          </c:if>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="nom">Nom du produit <span class="required">*</span></label>
+              <input type="text" id="nom" name="nom"
+                     class="form-control"
+                     placeholder="iPhone 15 Pro"
+                     value="<c:out value='${produit.nom}'/>"
+                     required minlength="2" maxlength="200"
+                     aria-required="true">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="marque">Marque <span class="required">*</span></label>
+              <input type="text" id="marque" name="marque"
+                     class="form-control"
+                     placeholder="Apple, Samsung..."
+                     value="<c:out value='${produit.marque}'/>"
+                     required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="description">Description</label>
+            <textarea id="description" name="description"
+                      class="form-control"
+                      placeholder="Description détaillée du produit..."
+                      rows="4"><c:out value='${produit.description}'/></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="prix">Prix (€) <span class="required">*</span></label>
+              <div style="position:relative;">
+                <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--gold);font-weight:700;">€</span>
+                <input type="number" id="prix" name="prix"
+                       class="form-control"
+                       style="padding-left:2.2rem;"
+                       placeholder="0.00"
+                       value="<c:out value='${produit.prix}'/>"
+                       required min="0" step="0.01"
+                       aria-describedby="prix-hint">
+              </div>
+              <div class="form-hint" id="prix-hint">Entrez le prix TTC en euros</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="stock">Stock initial <span class="required">*</span></label>
+              <input type="number" id="stock" name="stock"
+                     class="form-control"
+                     placeholder="0"
+                     value="<c:out value='${produit.stock}'/>"
+                     required min="0"
+                     aria-describedby="stock-hint">
+              <div class="form-hint" id="stock-hint">Nombre d'unités disponibles</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="categorieId">Catégorie <span class="required">*</span></label>
+              <select id="categorieId" name="categorieId" class="form-control" required>
+                <option value="">-- Sélectionner une catégorie --</option>
+                <c:forEach var="cat" items="${categories}">
+                  <option value="${cat.id}"
+                          ${produit.categorie.id == cat.id ? 'selected' : ''}>
+                    ${cat.nom}
+                  </option>
+                </c:forEach>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="imageUrl">Nom du fichier image</label>
+              <input type="text" id="imageUrl" name="imageUrl"
+                     class="form-control"
+                     placeholder="iphone15pro.jpg"
+                     value="<c:out value='${produit.imageUrl}'/>"
+                     aria-describedby="img-hint">
+              <div class="form-hint" id="img-hint">
+                Fichier stocké dans <code style="color:var(--gold);font-size:0.78rem;">resources/images/produits/</code>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:1rem;padding-top:1rem;border-top:1px solid var(--border);margin-top:0.5rem;">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <span>${isEdit ? '💾' : '➕'}</span>
+              <span>${isEdit ? 'Enregistrer les modifications' : 'Créer le produit'}</span>
+            </button>
+            <a href="${pageContext.request.contextPath}/admin/produits" class="btn btn-ghost btn-lg">
+              Annuler
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <%-- Panneau latéral : aperçu + contraintes qualité --%>
+      <div>
+        <%-- Aperçu image --%>
+        <div class="card" style="margin-bottom:1rem;">
+          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+                      color:var(--text-muted);margin-bottom:0.75rem;">Aperçu image</div>
+          <div style="width:100%;height:160px;background:var(--bg-elevated);border-radius:var(--radius-md);
+                      display:flex;align-items:center;justify-content:center;overflow:hidden;"
+               id="previewWrapper">
+            <c:choose>
+              <c:when test="${not empty produit.imageUrl}">
+                <img id="previewImg"
+                     src="${pageContext.request.contextPath}/resources/images/produits/${produit.imageUrl}"
+                     alt="Aperçu"
+                     style="max-width:100%;max-height:150px;object-fit:contain;padding:1rem;">
+              </c:when>
+              <c:otherwise>
+                <span style="font-size:3.5rem;color:var(--text-muted);" id="previewPlaceholder" aria-hidden="true">📦</span>
+                <img id="previewImg" src="" alt="" style="display:none;max-width:100%;max-height:150px;object-fit:contain;padding:1rem;">
+              </c:otherwise>
+            </c:choose>
+          </div>
+        </div>
+
+        <%-- Contraintes qualité --%>
+        <div class="card">
+          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+                      color:var(--text-muted);margin-bottom:0.75rem;">✅ Contraintes qualité</div>
+          <div style="display:flex;flex-direction:column;gap:0.6rem;">
+            <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text-secondary);">
+              <span style="color:var(--green-ok);">✓</span> Prix ≥ 0 (validation serveur)
+            </div>
+            <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text-secondary);">
+              <span style="color:var(--green-ok);">✓</span> Stock ≥ 0 (règle RM-02)
+            </div>
+            <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text-secondary);">
+              <span style="color:var(--green-ok);">✓</span> Suppression logique (RM-04)
+            </div>
+            <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text-secondary);">
+              <span style="color:var(--green-ok);">✓</span> Images dans resources/
+            </div>
+            <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text-secondary);">
+              <span style="color:var(--green-ok);">✓</span> PreparedStatement (ENF-SEC-04)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  // Aperçu image en temps réel
+  document.getElementById('imageUrl').addEventListener('input', function() {
+    const url = this.value.trim();
+    const img = document.getElementById('previewImg');
+    const placeholder = document.getElementById('previewPlaceholder');
+    if (url) {
+      img.src = '${pageContext.request.contextPath}/resources/images/produits/' + url;
+      img.style.display = 'block';
+      if (placeholder) placeholder.style.display = 'none';
+      img.onerror = () => {
+        img.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'flex';
+      };
+    } else {
+      img.style.display = 'none';
+      if (placeholder) placeholder.style.display = 'flex';
+    }
+  });
+
+  // Validation formulaire
+  document.getElementById('produitForm').addEventListener('submit', function(e) {
+    const prix = parseFloat(document.getElementById('prix').value);
+    const stock = parseInt(document.getElementById('stock').value);
+    if (prix < 0) { e.preventDefault(); alert('Le prix ne peut pas être négatif'); return; }
+    if (stock < 0) { e.preventDefault(); alert('Le stock ne peut pas être négatif'); return; }
+  });
+</script>
+<footer class="site-footer"><p>© 2025 TechShop — Administration</p></footer>
+</body>
+</html>

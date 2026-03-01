@@ -1,0 +1,271 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Créer un compte — TechShop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .auth-visual {
+      background: linear-gradient(135deg, #0a0a0f, #0d0d18);
+      display: flex; flex-direction: column;
+      justify-content: center; padding: 4rem;
+      position: relative; overflow: hidden;
+    }
+    .auth-visual::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 60% 30%, rgba(126,184,247,0.1) 0%, transparent 70%),
+                  radial-gradient(ellipse 40% 40% at 20% 80%, rgba(240,192,64,0.08) 0%, transparent 60%);
+    }
+    .auth-visual-content { position: relative; z-index: 1; }
+    .auth-form-panel {
+      display: flex; align-items: center; justify-content: center;
+      padding: 3rem 2rem;
+      background: var(--bg-elevated);
+      overflow-y: auto;
+    }
+    .auth-form-container { width: 100%; max-width: 480px; }
+    .step-indicator {
+      display: flex; align-items: center; gap: 0;
+      margin-bottom: 2rem;
+    }
+    .step-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 700;
+      color: var(--text-muted);
+    }
+    .step-dot.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--bg-base);
+    }
+    .step-dot.done { background: var(--green-ok); border-color: var(--green-ok); color: var(--bg-base); }
+    .step-line {
+      flex: 1; height: 1px; background: var(--border);
+      margin: 0 0.5rem;
+    }
+    @media (max-width: 768px) {
+      .auth-page { grid-template-columns: 1fr; }
+      .auth-visual { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="auth-page">
+
+  <div class="auth-visual" aria-hidden="true">
+    <div class="auth-visual-content">
+      <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;margin-bottom:2.5rem;">
+        <span style="color:var(--gold)">⚡</span> TechShop
+      </div>
+      <h1 style="font-family:var(--font-display);font-size:2.8rem;font-weight:800;line-height:1.1;letter-spacing:-0.04em;margin-bottom:1.25rem;">
+        Rejoignez<br><span style="color:var(--blue-ice)">la communauté</span><br>TechShop.
+      </h1>
+      <p style="color:var(--text-secondary);line-height:1.7;max-width:380px;">
+        Créez votre compte en quelques secondes et accédez à des milliers de produits électroniques au meilleur prix.
+      </p>
+      <div style="margin-top:3rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.25rem;">
+          <div style="font-size:1.8rem;font-weight:800;font-family:var(--font-display);color:var(--gold);">14+</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem;">Produits premium</div>
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.25rem;">
+          <div style="font-size:1.8rem;font-weight:800;font-family:var(--font-display);color:var(--blue-ice);">5</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem;">Catégories</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="auth-form-panel">
+    <div class="auth-form-container fade-up">
+
+      <div style="margin-bottom:0.5rem;">
+        <a href="${pageContext.request.contextPath}/catalogue"
+           style="font-size:0.82rem;color:var(--text-muted);display:inline-flex;align-items:center;gap:0.3rem;">
+          ← Retour au catalogue
+        </a>
+      </div>
+
+      <h2 style="font-family:var(--font-display);font-size:1.7rem;font-weight:700;letter-spacing:-0.03em;margin-bottom:0.4rem;">
+        Créer un compte
+      </h2>
+      <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:2rem;">
+        Tous les champs marqués <span style="color:var(--gold);">*</span> sont obligatoires
+      </p>
+
+      <c:if test="${not empty erreur}">
+        <div class="alert alert-error" role="alert">
+          <span class="alert-icon" aria-hidden="true">⚠️</span>
+          <span>${erreur}</span>
+        </div>
+      </c:if>
+
+      <form action="${pageContext.request.contextPath}/inscription"
+            method="post"
+            novalidate
+            id="inscriptionForm"
+            aria-label="Formulaire d'inscription">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="prenom">
+              Prénom <span class="required">*</span>
+            </label>
+            <input type="text" id="prenom" name="prenom"
+                   class="form-control"
+                   placeholder="Jean"
+                   value="<c:out value='${prenom}'/>"
+                   required minlength="2"
+                   autocomplete="given-name"
+                   aria-required="true">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="nom">
+              Nom <span class="required">*</span>
+            </label>
+            <input type="text" id="nom" name="nom"
+                   class="form-control"
+                   placeholder="Dupont"
+                   value="<c:out value='${nom}'/>"
+                   required minlength="2"
+                   autocomplete="family-name"
+                   aria-required="true">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">
+            Adresse e-mail <span class="required">*</span>
+          </label>
+          <div style="position:relative;">
+            <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--text-muted);" aria-hidden="true">✉️</span>
+            <input type="email" id="email" name="email"
+                   class="form-control"
+                   style="padding-left:2.8rem;"
+                   placeholder="jean.dupont@email.com"
+                   value="<c:out value='${email}'/>"
+                   required
+                   autocomplete="email"
+                   aria-required="true"
+                   aria-describedby="email-hint">
+          </div>
+          <div class="form-hint" id="email-hint">Cet email servira d'identifiant de connexion</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">
+            Mot de passe <span class="required">*</span>
+          </label>
+          <div style="position:relative;">
+            <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--text-muted);" aria-hidden="true">🔒</span>
+            <input type="password" id="password" name="password"
+                   class="form-control"
+                   style="padding-left:2.8rem;"
+                   placeholder="Minimum 6 caractères"
+                   required minlength="6"
+                   autocomplete="new-password"
+                   aria-required="true"
+                   aria-describedby="pwd-hint"
+                   oninput="checkPasswordStrength(this.value)">
+            <span style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);color:var(--text-muted);cursor:pointer;"
+                  onclick="togglePassword('password', this)"
+                  role="button" tabindex="0" aria-label="Afficher le mot de passe">👁️</span>
+          </div>
+          <div id="pwd-hint" class="form-hint">Minimum 6 caractères</div>
+          <div id="pwd-strength" style="margin-top:0.5rem;display:none;">
+            <div style="display:flex;gap:4px;">
+              <div class="strength-bar" id="sb1" style="height:3px;flex:1;border-radius:2px;background:var(--border);transition:background 0.3s;"></div>
+              <div class="strength-bar" id="sb2" style="height:3px;flex:1;border-radius:2px;background:var(--border);transition:background 0.3s;"></div>
+              <div class="strength-bar" id="sb3" style="height:3px;flex:1;border-radius:2px;background:var(--border);transition:background 0.3s;"></div>
+              <div class="strength-bar" id="sb4" style="height:3px;flex:1;border-radius:2px;background:var(--border);transition:background 0.3s;"></div>
+            </div>
+            <div id="pwd-strength-label" style="font-size:0.72rem;color:var(--text-muted);margin-top:0.3rem;"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adresse">Adresse de livraison</label>
+          <textarea id="adresse" name="adresse"
+                    class="form-control"
+                    placeholder="12 Rue de la Paix, 75002 Paris"
+                    rows="2"
+                    autocomplete="street-address"><c:out value='${adresse}'/></textarea>
+          <div class="form-hint">Peut être modifiée lors de chaque commande</div>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;gap:0.6rem;margin-bottom:1.5rem;">
+          <input type="checkbox" id="cgu" name="cgu"
+                 style="accent-color:var(--gold);width:16px;height:16px;margin-top:2px;" required>
+          <label for="cgu" style="font-size:0.83rem;color:var(--text-secondary);cursor:pointer;line-height:1.5;">
+            J'accepte les <a href="#" style="color:var(--gold);">Conditions Générales d'Utilisation</a>
+            et la <a href="#" style="color:var(--gold);">Politique de confidentialité</a>
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg">
+          <span>Créer mon compte</span>
+          <span aria-hidden="true">✨</span>
+        </button>
+      </form>
+
+      <div style="text-align:center;margin-top:1.5rem;font-size:0.85rem;color:var(--text-secondary);">
+        Déjà un compte ?
+        <a href="${pageContext.request.contextPath}/login" style="color:var(--gold);font-weight:600;">Se connecter</a>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  function togglePassword(id, btn) {
+    const input = document.getElementById(id);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.textContent = input.type === 'password' ? '👁️' : '🙈';
+  }
+
+  function checkPasswordStrength(pwd) {
+    const bars = ['sb1','sb2','sb3','sb4'];
+    const label = document.getElementById('pwd-strength-label');
+    const container = document.getElementById('pwd-strength');
+    container.style.display = pwd.length > 0 ? 'block' : 'none';
+
+    let score = 0;
+    if (pwd.length >= 6) score++;
+    if (pwd.length >= 10) score++;
+    if (/[A-Z]/.test(pwd) && /[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+    const colors = ['', '#f06060', '#f0c040', '#7eb8f7', '#4cdb8f'];
+    const labels = ['', 'Trop court', 'Faible', 'Moyen', 'Fort'];
+    bars.forEach((id, i) => {
+      document.getElementById(id).style.background = i < score ? colors[score] : 'var(--border)';
+    });
+    label.textContent = labels[score] || '';
+    label.style.color = colors[score];
+  }
+
+  document.getElementById('inscriptionForm').addEventListener('submit', function(e) {
+    const cgu = document.getElementById('cgu');
+    if (!cgu.checked) {
+      e.preventDefault();
+      alert('Veuillez accepter les Conditions Générales d\'Utilisation');
+    }
+  });
+</script>
+</body>
+</html>

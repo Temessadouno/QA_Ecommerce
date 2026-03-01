@@ -1,0 +1,309 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion — TechShop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── Panneau gauche (visuel) ── */
+    .auth-visual {
+      background: linear-gradient(135deg, #0a0a0f 0%, #111118 50%, #0d0d18 100%);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 4rem;
+      position: relative; overflow: hidden;
+    }
+    .auth-visual::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 60% at 30% 40%, rgba(240,192,64,0.12) 0%, transparent 70%),
+                  radial-gradient(ellipse 40% 40% at 70% 70%, rgba(126,184,247,0.08) 0%, transparent 60%);
+    }
+    .auth-visual-content { position: relative; z-index: 1; }
+    .auth-brand {
+      display: flex; align-items: center; gap: 0.75rem;
+      font-family: var(--font-display);
+      font-size: 1.6rem; font-weight: 800;
+      margin-bottom: 3rem;
+    }
+    .auth-brand-icon {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--gold), #e08020);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 0 30px var(--gold-glow);
+    }
+    .auth-tagline {
+      font-family: var(--font-display);
+      font-size: 3rem; font-weight: 800;
+      line-height: 1.1; letter-spacing: -0.04em;
+      margin-bottom: 1.5rem;
+    }
+    .auth-tagline .accent { color: var(--gold); }
+    .auth-desc {
+      color: var(--text-secondary);
+      font-size: 1rem; line-height: 1.7;
+      max-width: 400px;
+    }
+    .auth-features {
+      margin-top: 3rem;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .auth-feature {
+      display: flex; align-items: center; gap: 1rem;
+      font-size: 0.88rem; color: var(--text-secondary);
+    }
+    .auth-feature-icon {
+      width: 36px; height: 36px;
+      background: var(--gold-glow);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+
+    /* ── Panneau droit (formulaire) ── */
+    .auth-form-panel {
+      display: flex; align-items: center; justify-content: center;
+      padding: 3rem 2rem;
+      background: var(--bg-elevated);
+    }
+    .auth-form-container {
+      width: 100%; max-width: 440px;
+    }
+    .auth-form-title {
+      font-family: var(--font-display);
+      font-size: 1.8rem; font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.4rem;
+    }
+    .auth-form-subtitle {
+      color: var(--text-secondary); font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .divider {
+      display: flex; align-items: center; gap: 1rem;
+      margin: 1.5rem 0;
+      color: var(--text-muted); font-size: 0.8rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .switch-auth {
+      text-align: center; margin-top: 1.5rem;
+      font-size: 0.85rem; color: var(--text-secondary);
+    }
+    .switch-auth a { color: var(--gold); font-weight: 600; }
+    .switch-auth a:hover { text-decoration: underline; }
+
+    .input-with-icon {
+      position: relative;
+    }
+    .input-with-icon .form-control { padding-left: 2.8rem; }
+    .input-with-icon .input-icon {
+      position: absolute; left: 1rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted); font-size: 0.9rem;
+      pointer-events: none;
+    }
+    .password-toggle {
+      position: absolute; right: 1rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted); cursor: pointer;
+      font-size: 0.85rem; user-select: none;
+    }
+    .password-toggle:hover { color: var(--gold); }
+
+    @media (max-width: 768px) {
+      .auth-page { grid-template-columns: 1fr; }
+      .auth-visual { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="auth-page">
+
+  <%-- ── Panneau gauche ── --%>
+  <div class="auth-visual" aria-hidden="true">
+    <div class="auth-visual-content">
+      <div class="auth-brand">
+        <div class="auth-brand-icon">⚡</div>
+        <span>Tech<span style="color:var(--gold)">Shop</span></span>
+      </div>
+      <h1 class="auth-tagline">
+        L'excellence<br><span class="accent">technologique</span><br>à portée de main.
+      </h1>
+      <p class="auth-desc">
+        Découvrez notre catalogue de produits électroniques premium — smartphones, laptops, audio et bien plus.
+      </p>
+      <div class="auth-features">
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🔒</div>
+          <span>Paiement sécurisé & données protégées</span>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🚀</div>
+          <span>Livraison express en 24h</span>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">✅</div>
+          <span>Garantie constructeur sur tous les produits</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%-- ── Formulaire de connexion ── --%>
+  <main class="auth-form-panel">
+    <div class="auth-form-container fade-up">
+
+      <h2 class="auth-form-title">Bon retour 👋</h2>
+      <p class="auth-form-subtitle">Connectez-vous à votre compte TechShop</p>
+
+      <%-- Alertes qualité --%>
+      <c:if test="${not empty succes}">
+        <div class="alert alert-success" role="alert">
+          <span class="alert-icon" aria-hidden="true">✅</span>
+          <span>${succes}</span>
+        </div>
+      </c:if>
+      <c:if test="${not empty erreur}">
+        <div class="alert alert-error" role="alert">
+          <span class="alert-icon" aria-hidden="true">⚠️</span>
+          <span>${erreur}</span>
+        </div>
+      </c:if>
+
+      <%-- Formulaire avec validation HTML5 + contraintes qualité --%>
+      <form action="${pageContext.request.contextPath}/login"
+            method="post"
+            novalidate
+            id="loginForm"
+            aria-label="Formulaire de connexion">
+
+        <%-- Protection CSRF (à implémenter) --%>
+        <%-- <input type="hidden" name="_csrf" value="${csrfToken}"> --%>
+
+        <div class="form-group">
+          <label class="form-label" for="email">
+            Adresse e-mail <span class="required" aria-hidden="true">*</span>
+          </label>
+          <div class="input-with-icon">
+            <span class="input-icon" aria-hidden="true">✉️</span>
+            <input type="email"
+                   id="email"
+                   name="email"
+                   class="form-control"
+                   placeholder="votre@email.com"
+                   value="<c:out value='${email}'/>"
+                   required
+                   autocomplete="email"
+                   aria-describedby="email-hint"
+                   aria-required="true">
+          </div>
+          <div class="form-hint" id="email-hint">Entrez l'email associé à votre compte</div>
+        </div>
+
+        <div class="form-group">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.5rem;">
+            <label class="form-label" for="password" style="margin-bottom:0;">
+              Mot de passe <span class="required" aria-hidden="true">*</span>
+            </label>
+            <a href="#" style="font-size:0.78rem;color:var(--gold);">Mot de passe oublié ?</a>
+          </div>
+          <div class="input-with-icon">
+            <span class="input-icon" aria-hidden="true">🔒</span>
+            <input type="password"
+                   id="password"
+                   name="password"
+                   class="form-control"
+                   placeholder="••••••••"
+                   required
+                   autocomplete="current-password"
+                   aria-required="true">
+            <span class="password-toggle" onclick="togglePassword('password', this)"
+                  role="button" tabindex="0" aria-label="Afficher/masquer le mot de passe">👁️</span>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.5rem;">
+          <input type="checkbox" id="remember" name="remember"
+                 style="accent-color:var(--gold);width:16px;height:16px;">
+          <label for="remember" style="font-size:0.85rem;color:var(--text-secondary);cursor:pointer;">
+            Se souvenir de moi
+          </label>
+        </div>
+
+        <button type="submit"
+                class="btn btn-primary btn-full btn-lg"
+                id="submitBtn">
+          <span>Se connecter</span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </form>
+
+      <div class="divider">ou</div>
+
+      <div class="switch-auth">
+        Pas encore de compte ?
+        <a href="${pageContext.request.contextPath}/inscription">Créer un compte gratuitement</a>
+      </div>
+
+      <%-- Comptes de test (développement uniquement) --%>
+      <div style="margin-top:2rem;padding:1rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.8rem;">
+        <div style="color:var(--text-muted);font-weight:600;margin-bottom:0.5rem;">🧪 Comptes de test</div>
+        <div style="color:var(--text-secondary);">Admin : admin@ecommerce.com / Admin2024!</div>
+        <div style="color:var(--text-secondary);">Client : jean.dupont@test.com / Test1234!</div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  // Contrainte qualité : validation côté client en complément du serveur
+  function togglePassword(id, btn) {
+    const input = document.getElementById(id);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.textContent = input.type === 'password' ? '👁️' : '🙈';
+  }
+
+  // Validation HTML5 améliorée avec accessibilité
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    let valid = true;
+
+    if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+      email.setCustomValidity('Adresse email invalide');
+      valid = false;
+    } else {
+      email.setCustomValidity('');
+    }
+
+    if (!password.value) {
+      password.setCustomValidity('Le mot de passe est obligatoire');
+      valid = false;
+    } else {
+      password.setCustomValidity('');
+    }
+
+    if (!valid) { e.preventDefault(); this.reportValidity(); }
+  });
+</script>
+</body>
+</html>

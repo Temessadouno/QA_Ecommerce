@@ -1,0 +1,30 @@
+package dao.produit;
+
+
+import models.Produit;
+import java.util.List;
+
+/**
+ * Interface DAO pour la gestion des produits.
+ * Les méthodes de liste excluent automatiquement les produits supprimés (deleted=true).
+ */
+public interface ProduitDAO extends GenericDAO<Produit, Integer> {
+
+    /** Retourne tous les produits non supprimés (catalogue visible). */
+    List<Produit> findAllActive();
+
+    /** Recherche par mot-clé dans nom, description ou marque (non supprimés). */
+    List<Produit> search(String keyword);
+
+    /** Filtre par catégorie (non supprimés). */
+    List<Produit> findByCategorie(Integer categorieId);
+
+    /** Recherche combinée mot-clé + catégorie. */
+    List<Produit> searchAndFilter(String keyword, Integer categorieId);
+
+    /** Mise à jour du stock uniquement (optimisée). */
+    void updateStock(Integer produitId, int newStock);
+
+    /** Suppression logique : passe deleted = true. */
+    void softDelete(Integer produitId);
+}

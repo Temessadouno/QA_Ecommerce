@@ -1,0 +1,115 @@
+package dao.categorie;
+
+
+import util.JPAUtil;
+import models.Commande;
+import dao.commande.CommandeDAO;
+
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import java.util.List;
+import java.util.Optional;
+
+
+
+public class CategorieDAOImplement  implements CategorieDAO {
+
+	    @Override
+	    public Commande save(Commande commande) {
+	        EntityManager em = JPAUtil.getEntityManager();
+	        try {
+	            em.getTransaction().begin();
+	            em.persist(commande);
+	            em.getTransaction().commit();
+	            return commande;
+	        } catch (Exception e) {
+	            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+	            throw new RuntimeException("Erreur création commande", e);
+	        } finally {
+	            em.close();
+	        }
+	    }
+
+	    @Override
+	    public Commande update(Commande commande) {
+	        EntityManager em = JPAUtil.getEntityManager();
+	        try {
+	            em.getTransaction().begin();
+	            Commande merged = em.merge(commande);
+	            em.getTransaction().commit();
+	            return merged;
+	        } catch (Exception e) {
+	            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+	            throw new RuntimeException("Erreur mise à jour commande", e);
+	        } finally {
+	            em.close();
+	        }
+	    }
+
+	    @Override
+	    public void delete(Integer id) {
+	        throw new UnsupportedOperationException("Suppression de commande interdite");
+	    }
+
+	    @Override
+	    public Optional<Commande> findById(Integer id) {
+	        EntityManager em = JPAUtil.getEntityManager();
+	        try {
+	            // JOIN FETCH pour charger les lignes eagerly
+	            TypedQuery<Commande> q = em.createQuery(
+	                "SELECT c FROM Commande c LEFT JOIN FETCH c.lignes WHERE c.id = :id",
+	                Commande.class);
+	            q.setParameter("id", id);
+	            List<Commande> res = q.getResultList();
+	            return res.isEmpty() ? Optional.empty() : Optional.of(res.get(0));
+	        } finally {
+	            em.close();
+	        }
+	    }
+
+	    @Override
+	    public List<Commande> findAll() {
+	        return findAllWithClient();
+	    }
+
+	    @Override
+	    public List<Commande> findAllWithClient() {
+	        EntityManager em = JPAUtil.getEntityManager();
+	        try {
+	            return em.createQuery(
+	                "SELECT c FROM Commande c JOIN FETCH c.client ORDER BY c.dateCommande DESC",
+	                Commande.class).getResultList();
+	        } finally {
+	            em.close();
+	        }
+	    }
+
+	    @Override
+	    public List<Commande> findByClientId(Integer clientId) {
+	        EntityManager em = JPAUtil.getEntityManager();
+	        try {
+	            return em.createQuery(
+	                "SELECT c FROM Commande c WHERE c.client.id = :cid ORDER BY c.dateCommande DESC",
+	                Commande.class)
+	                .setParameter("cid", clientId)
+	                .getResultList();
+	        } finally {
+	            em.close();
+	        }
+	    }
+
+	    @Override
+	    public List<Commande> findByStatut(Commande.Statut statut) {
+	        EntityManager em = JPAUtil.getEntityManager();
+	        try {
+	            return em.createQuery(
+	                "SELECT c FROM Commande c JOIN FETCH c.client WHERE c.statut = :statut ORDER BY c.dateCommande DESC",
+	                Commande.class)
+	                .setParameter("statut", statut)
+	                .getResultList();
+	        } finally {
+	            em.close();
+	        }
+	    }
+	}

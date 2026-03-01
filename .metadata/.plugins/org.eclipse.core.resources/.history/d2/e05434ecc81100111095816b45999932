@@ -1,0 +1,239 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<c:set var="activePage" value="catalogue" scope="request"/>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalogue — TechShop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
+</head>
+<body>
+
+<%@ include file="navbar.jsp" %>
+
+<div class="page-wrapper">
+
+  <%-- Alertes session --%>
+  <c:if test="${not empty sessionScope.succes}">
+    <div class="alert alert-success"><span class="alert-icon">✅</span><span>${sessionScope.succes}</span></div>
+    <c:remove var="succes" scope="session"/>
+  </c:if>
+  <c:if test="${not empty sessionScope.erreur}">
+    <div class="alert alert-error"><span class="alert-icon">⚠️</span><span>${sessionScope.erreur}</span></div>
+    <c:remove var="erreur" scope="session"/>
+  </c:if>
+
+  <%-- En-tête + recherche --%>
+  <div class="page-header fade-up">
+    <h1 class="page-title">Catalogue <span style="color:var(--gold)">électronique</span></h1>
+    <p class="page-subtitle">${totalProduits} produit${totalProduits != 1 ? 's' : ''} disponible${totalProduits != 1 ? 's' : ''}</p>
+  </div>
+
+  <%-- Barre de recherche --%>
+  <div class="fade-up fade-up-1" style="margin-bottom:2rem;">
+    <form action="${pageContext.request.contextPath}/catalogue" method="get" role="search">
+      <div class="search-bar">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input type="search"
+               name="q"
+               value="<c:out value='${keyword}'/>"
+               placeholder="Rechercher un produit, une marque..."
+               aria-label="Rechercher un produit"
+               autocomplete="off">
+        <c:if test="${not empty categorieId}">
+          <input type="hidden" name="categorie" value="${categorieId}">
+        </c:if>
+        <button type="submit" class="search-btn">Rechercher</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="layout-with-sidebar fade-up fade-up-2">
+
+    <%-- ── Sidebar filtres ── --%>
+    <aside class="sidebar" aria-label="Filtres">
+      <div class="sidebar-title">Filtres</div>
+
+      <form action="${pageContext.request.contextPath}/catalogue" method="get" id="filterForm">
+        <c:if test="${not empty keyword}">
+          <input type="hidden" name="q" value="<c:out value='${keyword}'/>">
+        </c:if>
+
+        <div class="filter-group">
+          <div class="filter-group-title">Catégorie</div>
+          <label class="filter-option ${empty categorieId ? 'active' : ''}">
+            <input type="radio" name="categorie" value=""
+                   ${empty categorieId ? 'checked' : ''}
+                   onchange="document.getElementById('filterForm').submit()">
+            <span>Toutes les catégories</span>
+          </label>
+          <c:forEach var="cat" items="${categories}">
+            <label class="filter-option ${categorieId == cat.id ? 'active' : ''}">
+              <input type="radio" name="categorie" value="${cat.id}"
+                     ${categorieId == cat.id ? 'checked' : ''}
+                     onchange="document.getElementById('filterForm').submit()">
+              <span>${cat.nom}</span>
+            </label>
+          </c:forEach>
+        </div>
+
+        <div class="filter-group">
+          <div class="filter-group-title">Disponibilité</div>
+          <label class="filter-option">
+            <input type="checkbox" name="enStock" value="true" onchange="document.getElementById('filterForm').submit()">
+            <span>En stock uniquement</span>
+          </label>
+        </div>
+
+        <c:if test="${not empty keyword or not empty categorieId}">
+          <a href="${pageContext.request.contextPath}/catalogue"
+             class="btn btn-ghost btn-full btn-sm"
+             style="margin-top:0.5rem;">
+            ✕ Effacer les filtres
+          </a>
+        </c:if>
+      </form>
+
+      <%-- Qualité : indicateur de filtres actifs --%>
+      <c:if test="${not empty keyword or not empty categorieId}">
+        <div style="margin-top:1rem;padding:0.75rem;background:var(--gold-glow);border:1px solid var(--border-strong);border-radius:var(--radius-sm);">
+          <div style="font-size:0.75rem;color:var(--gold);font-weight:600;">Filtres actifs</div>
+          <c:if test="${not empty keyword}">
+            <div style="font-size:0.78rem;color:var(--text-secondary);margin-top:0.2rem;">
+              Recherche : "<c:out value='${keyword}'/>"
+            </div>
+          </c:if>
+        </div>
+      </c:if>
+    </aside>
+
+    <%-- ── Grille produits ── --%>
+    <main aria-label="Liste des produits">
+
+      <c:choose>
+        <c:when test="${empty produits}">
+          <%-- État vide --%>
+          <div style="text-align:center;padding:4rem 2rem;color:var(--text-muted);">
+            <div style="font-size:4rem;margin-bottom:1rem;" aria-hidden="true">🔍</div>
+            <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.5rem;">
+              Aucun produit trouvé
+            </div>
+            <div style="font-size:0.88rem;">Essayez d'autres mots-clés ou supprimez les filtres</div>
+            <a href="${pageContext.request.contextPath}/catalogue"
+               class="btn btn-secondary" style="margin-top:1.5rem;display:inline-flex;">
+              Voir tous les produits
+            </a>
+          </div>
+        </c:when>
+        <c:otherwise>
+          <div class="product-grid">
+            <c:forEach var="produit" items="${produits}" varStatus="loop">
+              <article class="product-card fade-up"
+                       style="animation-delay: ${loop.index * 0.06}s"
+                       aria-label="${produit.nom}">
+
+                <%-- Image --%>
+                <a href="${pageContext.request.contextPath}/produit/detail?id=${produit.id}"
+                   aria-label="Voir le détail de ${produit.nom}">
+                  <div class="product-img-wrapper">
+                    <c:choose>
+                      <c:when test="${not empty produit.imageUrl}">
+                        <img src="${pageContext.request.contextPath}/resources/images/produits/${produit.imageUrl}"
+                             alt="${produit.nom}"
+                             loading="lazy"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <div class="product-img-placeholder" style="display:none;" aria-hidden="true">📱</div>
+                      </c:when>
+                      <c:otherwise>
+                        <div class="product-img-placeholder" aria-hidden="true">
+                          <c:choose>
+                            <c:when test="${fn:contains(produit.categorie.nom,'Smartphone')}">📱</c:when>
+                            <c:when test="${fn:contains(produit.categorie.nom,'Ordinateur')}">💻</c:when>
+                            <c:when test="${fn:contains(produit.categorie.nom,'Audio')}">🎧</c:when>
+                            <c:when test="${fn:contains(produit.categorie.nom,'Tablette')}">📟</c:when>
+                            <c:otherwise>🔌</c:otherwise>
+                          </c:choose>
+                        </div>
+                      </c:otherwise>
+                    </c:choose>
+
+                    <%-- Badge catégorie --%>
+                    <span class="product-badge badge-category">${produit.categorie.nom}</span>
+
+                    <%-- Badge rupture de stock --%>
+                    <c:if test="${produit.stock == 0}">
+                      <span class="product-badge badge-rupture"
+                            style="top:auto;bottom:0.75rem;">Rupture</span>
+                    </c:if>
+                  </div>
+                </a>
+
+                <div class="product-body">
+                  <div class="product-brand">${produit.marque}</div>
+                  <h2 class="product-name">
+                    <a href="${pageContext.request.contextPath}/produit/detail?id=${produit.id}">
+                      ${produit.nom}
+                    </a>
+                  </h2>
+                  <p class="product-desc">${produit.description}</p>
+                </div>
+
+                <div class="product-footer">
+                  <div>
+                    <div class="product-price">${produit.prix} €</div>
+                    <c:choose>
+                      <c:when test="${produit.stock == 0}">
+                        <span class="product-stock-chip stock-out">Rupture de stock</span>
+                      </c:when>
+                      <c:when test="${produit.stock <= 5}">
+                        <span class="product-stock-chip stock-low">Plus que ${produit.stock}</span>
+                      </c:when>
+                      <c:otherwise>
+                        <span class="product-stock-chip stock-ok">En stock</span>
+                      </c:otherwise>
+                    </c:choose>
+                  </div>
+
+                  <c:choose>
+                    <c:when test="${not empty sessionScope.client and not sessionScope.client.admin and produit.stock > 0}">
+                      <%-- Ajout rapide au panier --%>
+                      <form action="${pageContext.request.contextPath}/panier/ajouter" method="post">
+                        <input type="hidden" name="produitId" value="${produit.id}">
+                        <input type="hidden" name="quantite" value="1">
+                        <button type="submit" class="btn btn-primary btn-sm"
+                                aria-label="Ajouter ${produit.nom} au panier">
+                          🛒
+                        </button>
+                      </form>
+                    </c:when>
+                    <c:when test="${produit.stock == 0}">
+                      <button class="btn btn-ghost btn-sm" disabled aria-label="Produit indisponible">
+                        Indisponible
+                      </button>
+                    </c:when>
+                    <c:otherwise>
+                      <a href="${pageContext.request.contextPath}/produit/detail?id=${produit.id}"
+                         class="btn btn-secondary btn-sm">
+                        Voir
+                      </a>
+                    </c:otherwise>
+                  </c:choose>
+                </div>
+              </article>
+            </c:forEach>
+          </div>
+        </c:otherwise>
+      </c:choose>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer" role="contentinfo">
+  <p>© 2025 TechShop — Tous droits réservés &bull; Projet E-Commerce JEE</p>
+</footer>
+</body>
+</html>

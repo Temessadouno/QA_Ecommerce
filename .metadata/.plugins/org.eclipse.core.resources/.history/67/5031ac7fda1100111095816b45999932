@@ -1,0 +1,204 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<c:set var="activePage" value="catalogue" scope="request"/>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${produit.nom} — TechShop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
+</head>
+<body>
+<%@ include file="navbar.jsp" %>
+
+<div class="page-wrapper">
+  <div class="page-breadcrumb">
+    <a href="${pageContext.request.contextPath}/catalogue">Catalogue</a>
+    <span aria-hidden="true">›</span>
+    <a href="${pageContext.request.contextPath}/catalogue?categorie=${produit.categorie.id}">${produit.categorie.nom}</a>
+    <span aria-hidden="true">›</span>
+    <span style="color:var(--text-secondary);">${produit.nom}</span>
+  </div>
+
+  <div class="product-detail-grid fade-up">
+
+    <%-- Image --%>
+    <div>
+      <div class="product-image-main">
+        <c:choose>
+          <c:when test="${not empty produit.imageUrl}">
+            <img src="${pageContext.request.contextPath}/resources/images/produits/${produit.imageUrl}"
+                 alt="${produit.nom}" style="max-height:340px;object-fit:contain;"
+                 onerror="this.style.display='none';document.getElementById('img-placeholder').style.display='flex'">
+            <div id="img-placeholder" style="display:none;font-size:6rem;color:var(--text-muted);" aria-hidden="true">📱</div>
+          </c:when>
+          <c:otherwise>
+            <div style="font-size:7rem;color:var(--text-muted);" aria-hidden="true">
+              <c:choose>
+                <c:when test="${fn:contains(produit.categorie.nom,'Smartphone')}">📱</c:when>
+                <c:when test="${fn:contains(produit.categorie.nom,'Ordinateur')}">💻</c:when>
+                <c:when test="${fn:contains(produit.categorie.nom,'Audio')}">🎧</c:when>
+                <c:when test="${fn:contains(produit.categorie.nom,'Tablette')}">📟</c:when>
+                <c:otherwise>🔌</c:otherwise>
+              </c:choose>
+            </div>
+          </c:otherwise>
+        </c:choose>
+      </div>
+
+      <%-- Méta produit (mobile) --%>
+      <div style="display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap;">
+        <span class="badge badge-category">${produit.categorie.nom}</span>
+        <c:if test="${produit.stock > 0}">
+          <span class="badge badge-validee">✓ En stock</span>
+        </c:if>
+        <c:if test="${produit.stock == 0}">
+          <span class="badge badge-annulee">Rupture de stock</span>
+        </c:if>
+      </div>
+    </div>
+
+    <%-- Infos produit --%>
+    <div>
+      <div class="product-brand" style="font-size:0.85rem;letter-spacing:0.1em;margin-bottom:0.5rem;">
+        ${produit.marque}
+      </div>
+
+      <h1 style="font-family:var(--font-display);font-size:2rem;font-weight:700;letter-spacing:-0.03em;line-height:1.2;margin-bottom:1rem;">
+        ${produit.nom}
+      </h1>
+
+      <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:2rem;">
+        ${produit.description}
+      </p>
+
+      <%-- Prix + stock --%>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;">
+        <div style="display:flex;align-items:baseline;gap:1rem;margin-bottom:1rem;">
+          <div style="font-family:var(--font-display);font-size:2.2rem;font-weight:800;color:var(--gold);">
+            ${produit.prix} €
+          </div>
+          <div style="font-size:0.8rem;color:var(--text-muted);">TTC</div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.5rem;">
+          <c:choose>
+            <c:when test="${produit.stock == 0}">
+              <span style="color:var(--red-alert);" aria-live="polite">✗ Rupture de stock</span>
+            </c:when>
+            <c:when test="${produit.stock <= 5}">
+              <span style="color:var(--gold);" aria-live="polite">
+                ⚠ Plus que <strong>${produit.stock}</strong> exemplaire${produit.stock > 1 ? 's' : ''} disponible${produit.stock > 1 ? 's' : ''}
+              </span>
+            </c:when>
+            <c:otherwise>
+              <span style="color:var(--green-ok);" aria-live="polite">
+                ✓ En stock — ${produit.stock} disponible${produit.stock > 1 ? 's' : ''}
+              </span>
+            </c:otherwise>
+          </c:choose>
+        </div>
+
+        <%-- Formulaire ajout panier --%>
+        <c:choose>
+          <c:when test="${not empty sessionScope.client and not sessionScope.client.admin}">
+            <c:if test="${produit.stock > 0}">
+              <c:if test="${not empty erreur}">
+                <div class="alert alert-error" style="margin-bottom:1rem;">
+                  <span>⚠️</span><span>${erreur}</span>
+                </div>
+              </c:if>
+              <form action="${pageContext.request.contextPath}/panier/ajouter" method="post"
+                    aria-label="Ajouter au panier">
+                <input type="hidden" name="produitId" value="${produit.id}">
+                <div style="display:flex;gap:0.75rem;align-items:center;">
+                  <div>
+                    <label class="form-label" for="quantite">Quantité</label>
+                    <input type="number" id="quantite" name="quantite"
+                           class="form-control"
+                           value="1" min="1" max="${produit.stock}"
+                           style="width:80px;"
+                           aria-label="Quantité à commander"
+                           aria-describedby="qty-hint">
+                    <div class="form-hint" id="qty-hint">Max : ${produit.stock}</div>
+                  </div>
+                  <div style="flex:1;margin-top:1.2rem;">
+                    <button type="submit" class="btn btn-primary btn-full btn-lg">
+                      <span>🛒</span>
+                      <span>Ajouter au panier</span>
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </c:if>
+          </c:when>
+          <c:when test="${empty sessionScope.client}">
+            <div class="alert alert-info">
+              <span>ℹ️</span>
+              <span>
+                <a href="${pageContext.request.contextPath}/login"
+                   style="color:var(--blue-ice);font-weight:600;">Connectez-vous</a>
+                pour ajouter des produits à votre panier
+              </span>
+            </div>
+          </c:when>
+        </c:choose>
+      </div>
+
+      <%-- Informations supplémentaires --%>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;">
+        <div style="padding:0.75rem 1.25rem;background:var(--bg-elevated);border-bottom:1px solid var(--border);
+                    font-size:0.78rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);">
+          Informations
+        </div>
+        <div style="padding:1rem 1.25rem;">
+          <table style="width:100%;font-size:0.85rem;">
+            <tr>
+              <td style="padding:0.5rem 0;color:var(--text-muted);width:140px;">Marque</td>
+              <td style="color:var(--text-primary);font-weight:500;">${produit.marque}</td>
+            </tr>
+            <tr>
+              <td style="padding:0.5rem 0;color:var(--text-muted);border-top:1px solid var(--border);">Catégorie</td>
+              <td style="color:var(--text-primary);border-top:1px solid var(--border);">
+                <a href="${pageContext.request.contextPath}/catalogue?categorie=${produit.categorie.id}"
+                   style="color:var(--gold);">${produit.categorie.nom}</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:0.5rem 0;color:var(--text-muted);border-top:1px solid var(--border);">Référence</td>
+              <td style="color:var(--text-muted);border-top:1px solid var(--border);
+                         font-family:var(--font-mono);font-size:0.8rem;">
+                #${produit.id}
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <%-- Garanties --%>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-top:1rem;">
+        <div style="text-align:center;padding:1rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);">
+          <div style="font-size:1.3rem;margin-bottom:0.25rem;">🔒</div>
+          <div style="font-size:0.72rem;color:var(--text-muted);">Paiement sécurisé</div>
+        </div>
+        <div style="text-align:center;padding:1rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);">
+          <div style="font-size:1.3rem;margin-bottom:0.25rem;">🚀</div>
+          <div style="font-size:0.72rem;color:var(--text-muted);">Livraison express</div>
+        </div>
+        <div style="text-align:center;padding:1rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);">
+          <div style="font-size:1.3rem;margin-bottom:0.25rem;">✅</div>
+          <div style="font-size:0.72rem;color:var(--text-muted);">Garantie 2 ans</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p>© 2025 TechShop — Tous droits réservés</p>
+</footer>
+</body>
+</html>

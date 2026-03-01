@@ -1,0 +1,5 @@
+package dao.categorie;
+
+public class CategorieDAOImplement {
+
+}

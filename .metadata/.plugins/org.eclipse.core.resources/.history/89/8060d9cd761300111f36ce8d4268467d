@@ -1,0 +1,144 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%-- ═══════════════════════════════════════════════════════
+     FRAGMENT : Navbar principale (inclure avec jsp:include)
+     Contrainte qualité : Aucune logique métier ici (MVC)
+     ═══════════════════════════════════════════════════════ --%>
+
+
+<nav class="fixed top-0 left-0 right-0 z-50 bg-gray-900/90 backdrop-blur-md border-b border-gray-800 py-3 px-4 md:px-8 flex items-center justify-between" 
+     role="navigation" 
+     aria-label="Navigation principale">
+
+  <%-- ── Logo ── --%>
+  <a class="flex items-center gap-2 text-white no-underline" href="${pageContext.request.contextPath}/catalogue" aria-label="TechShop Accueil">
+    <div class="text-2xl" aria-hidden="true">⚡</div>
+    <span class="text-xl font-display font-bold"><span class="text-white">Tech</span><span class="text-gold">Shop</span></span>
+  </a>
+
+  <%-- ── Liens principaux ── --%>
+  <ul class="hidden md:flex items-center gap-1 m-0 p-0 list-none" role="list">
+    <li>
+      <a href="${pageContext.request.contextPath}/catalogue"
+         class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 no-underline ${activePage == 'catalogue' ? 'bg-gold/10 text-gold border border-gold/20' : 'text-gray-300 hover:text-white hover:bg-gray-800/50'}"
+         aria-current="${activePage == 'catalogue' ? 'page' : 'false'}">
+        <span aria-hidden="true">🏪</span> Catalogue
+      </a>
+    </li>
+    <c:if test="${not empty sessionScope.client}">
+      <li>
+        <a href="${pageContext.request.contextPath}/commande/historique"
+           class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 no-underline ${activePage == 'commandes' ? 'bg-gold/10 text-gold border border-gold/20' : 'text-gray-300 hover:text-white hover:bg-gray-800/50'}"
+           aria-current="${activePage == 'commandes' ? 'page' : 'false'}">
+          <span aria-hidden="true">📦</span> Commandes
+        </a>
+      </li>
+    </c:if>
+    <c:if test="${sessionScope.client.admin}">
+      <li>
+        <a href="${pageContext.request.contextPath}/admin"
+           class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 no-underline ${activePage == 'admin' ? 'bg-gold/10 text-gold border border-gold/20' : 'text-gray-300 hover:text-white hover:bg-gray-800/50'}"
+           aria-current="${activePage == 'admin' ? 'page' : 'false'}">
+          <span aria-hidden="true">⚙️</span> Administration
+        </a>
+      </li>
+    </c:if>
+  </ul>
+
+  <%-- ── Actions droite ── --%>
+  <div class="flex items-center gap-3">
+
+    <%-- Panier (clients seulement) --%>
+    <c:if test="${not empty sessionScope.client and not sessionScope.client.admin}">
+		<a href="${pageContext.request.contextPath}/panier"
+		   class="relative flex items-center gap-2 ..."
+		   aria-label="Panier (${nbArticles} articles)">
+		    <span class="text-xl" aria-hidden="true">🛒</span>
+		    <span class="text-sm font-medium text-gray-300 group-hover:text-white">Panier</span>
+		    
+		    <%-- Utilisation de nbArticles pour la pastille --%>
+		    <c:if test="${nbArticles > 0}">
+		      <span class="absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center bg-gold text-gray-900 text-xs font-bold rounded-full">
+		          ${nbArticles}
+		      </span>
+		    </c:if>
+		</a>
+    </c:if>
+
+    <%-- Utilisateur connecté --%>
+    <c:choose>
+      <c:when test="${not empty sessionScope.client}">
+        <div class="relative group">
+          <button class="flex items-center gap-3 px-3 py-2 bg-gray-800/50 hover:bg-gray-800 rounded-xl transition-all duration-300 text-gray-300 hover:text-white" 
+                  aria-haspopup="true" 
+                  aria-expanded="false" 
+                  type="button">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center text-gray-900 font-bold text-sm" aria-hidden="true">
+              ${fn:substring(sessionScope.client.prenom, 0, 1)}${fn:substring(sessionScope.client.nom, 0, 1)}
+            </div>
+            <span class="text-sm font-medium hidden sm:inline">${sessionScope.client.prenom}</span>
+            <c:if test="${sessionScope.client.admin}">
+              <span class="px-2 py-0.5 bg-gold/20 text-gold text-xs font-bold rounded-full border border-gold/30">ADMIN</span>
+            </c:if>
+            <span class="text-xs text-gray-500" aria-hidden="true">▾</span>
+          </button>
+          <div class="absolute right-0 mt-2 w-64 bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl hidden group-hover:block" role="menu">
+            <div class="p-4 border-b border-gray-700">
+              <div class="font-display font-semibold text-white">${sessionScope.client.nomComplet}</div>
+              <div class="text-xs text-gray-400 mt-1">${sessionScope.client.email}</div>
+            </div>
+            <div class="p-2">
+              <c:if test="${not sessionScope.client.admin}">
+                <a href="${pageContext.request.contextPath}/commande/historique"
+                   class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all duration-200 no-underline"
+                   role="menuitem">
+                  <span class="text-xl" aria-hidden="true">📦</span>
+                  <span>Mes commandes</span>
+                </a>
+              </c:if>
+              <c:if test="${sessionScope.client.admin}">
+                <a href="${pageContext.request.contextPath}/admin"
+                   class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all duration-200 no-underline"
+                   role="menuitem">
+                  <span class="text-xl" aria-hidden="true">⚙️</span>
+                  <span>Dashboard admin</span>
+                </a>
+              </c:if>
+            </div>
+            <div class="h-px bg-gray-700 my-1"></div>
+            <div class="p-2">
+              <a href="${pageContext.request.contextPath}/logout"
+                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-all duration-200 no-underline"
+                 role="menuitem">
+                <span class="text-xl" aria-hidden="true">🚪</span>
+                <span>Se déconnecter</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </c:when>
+      <c:otherwise>
+        <a href="${pageContext.request.contextPath}/login"
+           class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl transition-all duration-300 no-underline">Connexion</a>
+        <a href="${pageContext.request.contextPath}/inscription"
+           class="px-4 py-2 bg-gold text-gray-900 text-sm font-medium rounded-xl hover:bg-gold-dark transition-all duration-300 no-underline">S'inscrire</a>
+      </c:otherwise>
+    </c:choose>
+  </div>
+
+  <%-- Mobile toggle --%>
+  <button class="md:hidden relative w-10 h-10 flex flex-col items-center justify-center gap-1.5 bg-gray-800/50 hover:bg-gray-800 rounded-xl transition-all duration-300" 
+          aria-label="Menu" 
+          aria-expanded="false"
+          onclick="document.querySelector('.nav-links').classList.toggle('mobile-open')"
+          id="mobileMenuBtn">
+    <span class="w-5 h-0.5 bg-gray-300 rounded-full"></span>
+    <span class="w-5 h-0.5 bg-gray-300 rounded-full"></span>
+    <span class="w-5 h-0.5 bg-gray-300 rounded-full"></span>
+  </button>
+
+</nav>
+
+<!-- Espacement pour compenser la navbar fixe -->
+<div class="h-[72px]"></div>
