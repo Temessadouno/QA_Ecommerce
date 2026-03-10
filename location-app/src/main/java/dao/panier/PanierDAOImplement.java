@@ -8,7 +8,11 @@ import jakarta.persistence.NoResultException;
 
 import java.util.List;
 import java.util.Optional;
-
+/*
+ * 
+ * Ici, nous parlons de la persistences du panier, util pour la non perte de données et pour l'évaluation
+ *  de toutes les intéraction du client avec le systeme
+ * */
 public class PanierDAOImplement implements PanierDAO {
 
     @Override
@@ -38,7 +42,36 @@ public class PanierDAOImplement implements PanierDAO {
             throw new RuntimeException("Erreur mise à jour panier", e);
         } finally { em.close(); }
     }
+    
+    
+    @Override
+    public void updateItemQuantity(Integer itemId, int quantite) {
+        System.out.println("Début modification quantité pour item ID " + itemId);
 
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            // Récupérer l'article via son ID
+            PanierItem item = em.find(PanierItem.class, itemId);
+            if (item != null) {
+                item.setQuantite(quantite); // mise à jour
+                em.merge(item); // persist modification
+                System.out.println("Quantité mise à jour à " + quantite);
+            } else {
+                System.out.println("Aucun article trouvé avec l'ID " + itemId);
+            }
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw new RuntimeException("Erreur lors de la mise à jour de la quantité", e);
+        } finally {
+            em.close();
+        }
+
+        System.out.println("Fin modification quantité");
+    }
     @Override
     public void delete(Integer itemId) {
         EntityManager em = JPAUtil.getEntityManager();
@@ -96,6 +129,7 @@ public class PanierDAOImplement implements PanierDAO {
         } finally { em.close(); }
     }
     
+    // methode qui compte les produit au panier d'un clien 
     @Override
     public int getPanierCount(Integer clientId) {
         EntityManager em = JPAUtil.getEntityManager();

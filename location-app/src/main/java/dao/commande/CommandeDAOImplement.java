@@ -8,6 +8,9 @@ import jakarta.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
+/*
+ * C'est la classe qui permet de manipuler les commandes en utilisant hibernate
+ * */
 public class CommandeDAOImplement implements CommandeDAO {
 
     @Override

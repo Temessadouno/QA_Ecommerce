@@ -7,7 +7,9 @@ import util.JPAUtil;
 
 import java.util.List;
 import java.util.Optional;
-
+/*
+ * Cette classe permet de manipuler les opérations sur les catégories
+ * */
 public class CategorieDAOImplement implements CategorieDAO {
 
     @Override

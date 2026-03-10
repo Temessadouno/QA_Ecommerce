@@ -52,10 +52,13 @@ public class PanierItem {
     // ── Getters / Setters ────────────────────────────────────
     public Integer getId()                          { return id; }
     public void setId(Integer id)                   { this.id = id; }
+    
     public Client getClient()                       { return client; }
     public void setClient(Client client)            { this.client = client; }
+    
     public Produit getProduit()                     { return produit; }
     public void setProduit(Produit produit)         { this.produit = produit; }
+    
     public int getQuantite()                        { return quantite; }
     public void setQuantite(int quantite)           { this.quantite = quantite; }
     public LocalDateTime getAddedAt()               { return addedAt; }

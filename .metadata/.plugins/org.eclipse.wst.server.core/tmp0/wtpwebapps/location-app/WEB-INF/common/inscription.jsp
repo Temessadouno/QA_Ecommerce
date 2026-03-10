@@ -144,7 +144,7 @@
             Adresse e-mail <span class="text-gold">*</span>
           </label>
           <div class="relative">
-            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" aria-hidden="true">✉️</span>
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" aria-hidden="true">  </span>
             <input type="email" id="email" name="email"
                    class="w-full h-12 pl-11 pr-4 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-600 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-300"
                    placeholder="jean.dupont@email.com"
@@ -163,7 +163,7 @@
             Mot de passe <span class="text-gold">*</span>
           </label>
           <div class="relative">
-            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" aria-hidden="true">🔒</span>
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" aria-hidden="true"> </span>
             <input type="password" id="password" name="password"
                    class="w-full h-12 pl-11 pr-12 bg-gray-800/50 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-600 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all duration-300"
                    placeholder="Minimum 6 caractères"
@@ -216,7 +216,7 @@
         <button type="submit" 
                 class="w-full h-12 bg-gradient-to-r from-gold to-gold-dark text-gray-900 font-medium rounded-xl hover:shadow-lg hover:shadow-gold/20 transition-all duration-300 flex items-center justify-center gap-2">
           <span>Créer mon compte</span>
-          <span aria-hidden="true">✨</span>
+          <span aria-hidden="true">  </span>
         </button>
       </form>
 

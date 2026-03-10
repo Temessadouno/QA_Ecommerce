@@ -100,6 +100,17 @@ public class PanierServices {
     	if (clientID == null) return 0;
     	return panierDAO.getPanierCount(clientID);
     }
+    
+    public void updateItemQuantity(Integer id, int quantite ) {
+    	 // Récupération via DAO pour mise à jour directe
+    	System.out.println("Quantité de l'article avec ID " + id + " mise à jour à " + quantite);
+    	
+    	
+    	panierDAO.updateItemQuantity(id,quantite);
+    	
+        
+    
+    }
 
     @SuppressWarnings("serial")
 	public static class PanierException extends RuntimeException {

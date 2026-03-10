@@ -150,12 +150,12 @@
                   <div class="flex items-center bg-gray-900/50 border border-gray-700 rounded-xl overflow-hidden">
                     <button type="button" 
                             class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-                            onclick="changeQty(${item.id}, ${item.quantite}, -1)"
+                            onclick="changeQty(${item.id}, -1)"
                             aria-label="Diminuer la quantité">−</button>
                     <span class="w-12 text-center font-medium" id="qty-${item.id}" aria-live="polite">${item.quantite}</span>
                     <button type="button" 
                             class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-                            onclick="changeQty(${item.id}, ${item.quantite}, 1, ${item.produit.stock})"
+                            onclick="changeQty(${item.id}, 1, ${item.produit.stock})"
                             aria-label="Augmenter la quantité">+</button>
                   </div>
                   <input type="hidden" name="quantite" id="qty-input-${item.id}" value="${item.quantite}">
@@ -238,13 +238,21 @@
 </footer>
 
 <script>
-  function changeQty(itemId, current, delta, max) {
+  function changeQty(itemId, delta, max) {
+    // Récupérer la quantité actuelle
+    let current = parseInt(document.getElementById('qty-' + itemId).textContent);
+
+    // Calculer la nouvelle quantité
     let newQty = current + delta;
+
+    // Vérifier les limites
     if (newQty < 0) newQty = 0;
     if (max && newQty > max) { 
       alert('Stock insuffisant (max : ' + max + ')'); 
       return; 
     }
+
+    // Mettre à jour l'affichage et le champ caché
     document.getElementById('qty-' + itemId).textContent = newQty;
     document.getElementById('qty-input-' + itemId).value = newQty;
   }

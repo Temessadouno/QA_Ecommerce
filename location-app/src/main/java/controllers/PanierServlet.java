@@ -51,6 +51,7 @@ public class PanierServlet extends HttpServlet {
                 ajouterAuPanier(req, resp);
                 break;
             case "/panier/modifier":
+            	System.out.println("Modifier Panier");
                 modifierPanier(req, resp);
                 break;
             case "/panier/supprimer":
@@ -110,12 +111,10 @@ public class PanierServlet extends HttpServlet {
             if (quantite <= 0) {
                 panierService.supprimerArticle(itemId);
             } else {
-                // Récupération via DAO pour mise à jour directe
-                new PanierDAOImplement().findByClientAndProduit(0, 0)
-                    .ifPresent(item -> {
-                        item.setQuantite(quantite);
-                        new PanierDAOImplement().update(item);
-                    });
+            	
+            	System.out.println("Modifier Panier");
+               panierService.updateItemQuantity(itemId,quantite);
+               
             }
         } catch (NumberFormatException ignored) {}
 

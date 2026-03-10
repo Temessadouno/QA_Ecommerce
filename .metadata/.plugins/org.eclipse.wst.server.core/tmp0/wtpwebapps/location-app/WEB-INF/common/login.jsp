@@ -67,15 +67,15 @@
       </p>
       <div class="space-y-4">
         <div class="flex items-center gap-4">
-          <div class="w-9 h-9 bg-gold-glow border border-gold/20 rounded-lg flex items-center justify-center text-base shrink-0">🔒</div>
+          <div class="w-9 h-9 bg-gold-glow border border-gold/20 rounded-lg flex items-center justify-center text-base shrink-0">  </div>
           <span class="text-sm text-gray-400">Paiement sécurisé & données protégées</span>
         </div>
         <div class="flex items-center gap-4">
-          <div class="w-9 h-9 bg-gold-glow border border-gold/20 rounded-lg flex items-center justify-center text-base shrink-0">🚀</div>
+          <div class="w-9 h-9 bg-gold-glow border border-gold/20 rounded-lg flex items-center justify-center text-base shrink-0">  </div>
           <span class="text-sm text-gray-400">Livraison express en 24h</span>
         </div>
         <div class="flex items-center gap-4">
-          <div class="w-9 h-9 bg-gold-glow border border-gold/20 rounded-lg flex items-center justify-center text-base shrink-0">✅</div>
+          <div class="w-9 h-9 bg-gold-glow border border-gold/20 rounded-lg flex items-center justify-center text-base shrink-0">  </div>
           <span class="text-sm text-gray-400">Garantie constructeur sur tous les produits</span>
         </div>
       </div>
@@ -86,19 +86,19 @@
   <main class="flex items-center justify-center p-8 md:p-12 bg-gray-900">
     <div class="w-full max-w-md animate-fade-up">
 
-      <h2 class="font-display text-3xl font-bold tracking-tight mb-1">Bon retour 👋</h2>
+      <h2 class="font-display text-3xl font-bold tracking-tight mb-1">Bon retour   </h2>
       <p class="text-gray-400 text-sm mb-8">Connectez-vous à votre compte TechShop</p>
 
       <%-- Alertes qualité --%>
       <c:if test="${not empty succes}">
         <div class="mb-6 p-4 bg-emerald-900/50 border border-emerald-600 rounded-xl flex items-center gap-3 text-emerald-200" role="alert">
-          <span class="text-2xl" aria-hidden="true">✅</span>
+          <span class="text-2xl" aria-hidden="true">   </span>
           <span>${succes}</span>
         </div>
       </c:if>
       <c:if test="${not empty erreur}">
         <div class="mb-6 p-4 bg-rose-900/50 border border-rose-600 rounded-xl flex items-center gap-3 text-rose-200" role="alert">
-          <span class="text-2xl" aria-hidden="true">⚠️</span>
+          <span class="text-2xl" aria-hidden="true">    </span>
           <span>${erreur}</span>
         </div>
       </c:if>
@@ -121,7 +121,7 @@
             </label>
           </div>
           <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm" aria-hidden="true">✉️</span>
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm" aria-hidden="true">      </span>
             <input type="email"
                    id="email"
                    name="email"
@@ -144,7 +144,7 @@
             <a href="#" class="text-xs text-gold hover:text-gold-dark transition-colors">Mot de passe oublié ?</a>
           </div>
           <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm" aria-hidden="true">🔒</span>
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm" aria-hidden="true">       </span>
             <input type="password"
                    id="password"
                    name="password"

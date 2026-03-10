@@ -12,6 +12,7 @@ public interface PanierDAO {
     PanierItem update(PanierItem item);
     void delete(Integer itemId);
     void deleteByClientId(Integer clientId);
+    void updateItemQuantity(Integer itemId,int quantite);
     List<PanierItem> findByClientId(Integer clientId);
     Optional<PanierItem> findByClientAndProduit(Integer clientId, Integer produitId);
 }
