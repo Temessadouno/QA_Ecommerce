@@ -13,7 +13,6 @@
 
   <%-- ── Logo ── --%>
   <a class="flex items-center gap-2 text-white no-underline" href="${pageContext.request.contextPath}/catalogue" aria-label="TechShop Accueil">
-    <div class="text-2xl" aria-hidden="true">⚡</div>
     <span class="text-xl font-display font-bold"><span class="text-white">Tech</span><span class="text-gold">Shop</span></span>
   </a>
 
@@ -23,15 +22,15 @@
       <a href="${pageContext.request.contextPath}/catalogue"
          class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 no-underline ${activePage == 'catalogue' ? 'bg-gold/10 text-gold border border-gold/20' : 'text-gray-300 hover:text-white hover:bg-gray-800/50'}"
          aria-current="${activePage == 'catalogue' ? 'page' : 'false'}">
-        <span aria-hidden="true">🏪</span> Catalogue
+        <span aria-hidden="true"></span> Catalogue
       </a>
     </li>
-    <c:if test="${not empty sessionScope.client}">
+    <c:if test="${not empty sessionScope.client and not sessionScope.client.admin }">
       <li>
         <a href="${pageContext.request.contextPath}/commande/historique"
            class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 no-underline ${activePage == 'commandes' ? 'bg-gold/10 text-gold border border-gold/20' : 'text-gray-300 hover:text-white hover:bg-gray-800/50'}"
            aria-current="${activePage == 'commandes' ? 'page' : 'false'}">
-          <span aria-hidden="true">📦</span> Commandes
+          <span aria-hidden="true"></span> Commandes
         </a>
       </li>
     </c:if>
@@ -40,7 +39,7 @@
         <a href="${pageContext.request.contextPath}/admin"
            class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 no-underline ${activePage == 'admin' ? 'bg-gold/10 text-gold border border-gold/20' : 'text-gray-300 hover:text-white hover:bg-gray-800/50'}"
            aria-current="${activePage == 'admin' ? 'page' : 'false'}">
-          <span aria-hidden="true">⚙️</span> Administration
+          <span aria-hidden="true"></span> Administration
         </a>
       </li>
     </c:if>

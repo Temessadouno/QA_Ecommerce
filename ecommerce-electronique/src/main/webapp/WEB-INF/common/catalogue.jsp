@@ -115,7 +115,7 @@
                                     <span class="text-[10px] font-bold uppercase tracking-widest bg-white text-black px-2 py-1">Épuisé</span>
                                 </div>
                             </c:if>
-                            <img src="${pageContext.request.contextPath}/images/pc.jpg" alt="${produit.nom}" 
+                            <img src="${pageContext.request.contextPath}/images/hp.jpg" alt="${produit.nom}" 
                                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100">
                         </div>
 

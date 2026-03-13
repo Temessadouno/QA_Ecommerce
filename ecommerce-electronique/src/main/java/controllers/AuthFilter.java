@@ -64,6 +64,7 @@ public class AuthFilter implements Filter {
             // Client connecté : mettre à jour le compteur panier
             int count = panierService.getPanierCount(client.getId());
             session.setAttribute("nbArticles", count);
+            //System.out.println(count);
             chain.doFilter(request, response);
         }
     }

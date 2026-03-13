@@ -96,7 +96,6 @@ public class AuthServlet extends HttpServlet {
             HttpSession session = req.getSession(true);
             session.setAttribute("client", client);
             session.setMaxInactiveInterval(30 * 60); // 30 minutes
-
             // Redirection selon le rôle
             if (client.isAdmin()) {
                 resp.sendRedirect(req.getContextPath() + "/admin");
