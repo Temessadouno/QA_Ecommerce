@@ -1,8 +1,4 @@
 INDEX VERSION 1.4+D:\ILISI2DOCS\Projets\ProjetEcommerce\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
-1807737398.index
-2384174378.index
-2279542150.index
-2255686585.index
-2869157042.index
-3746149097.index
-4120544620.index
+938966318.index
+938966318.index
+1156797785.index
